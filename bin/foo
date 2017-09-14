@@ -2,4 +2,7 @@
 
 set -euo pipefail
 
-exec "$(dirname "${BASH_SOURCE[0]}")/moth" run foo -- "$@"
+artifact_id="foo"
+version=1
+
+exec "$(dirname "${BASH_SOURCE[0]}")/moth" run "$artifact_id" "$version" -- "$@"

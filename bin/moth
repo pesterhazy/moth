@@ -21,25 +21,40 @@ def find_vcs_root(test, dirs=(".git",)):
         prev, test = test, os.path.abspath(os.path.join(test, os.pardir))
     raise Exception("No project root found")
 
-def fetch(target):
+def fetch(artifact_id, version, target):
+    print "Fetching:", artifact_id, version
     path = dirname(target)
     if path:
         mkdir_p(path)
-    check_call(["cp", "/Users/pe/arena/bin/dump-args", target])
+    repo_dir = os.path.expanduser("~/.moth-repo")
+    check_call(["cp", join(repo_dir,artifact_id,version,artifact_id), target])
+
+def split_argv(argv):
+    if '--' in argv:
+        idx = argv.index('--')
+
+        return [argv[:idx],argv[idx+1:]]
+    else:
+        return [argv, []]
 
 def run(args):
+    my_args, their_args = split_argv(args)
+
+    assert my_args[0] == "run"
+    assert len(my_args) == 3
+
+    artifact_id, version = my_args[1:]
+
     root_path = find_vcs_root(dirname(__file__))
     dot_dir = ".moth"
 
-    target_fn = "foo"
+    target_fn = artifact_id
 
     fname = join(root_path,dot_dir,target_fn)
 
     if not isfile(fname):
-        print "Fetching:", fname
+        fetch(artifact_id, version, fname)
 
-        fetch(fname)
-
-    os.execlp(fname, fname, *args)
+    os.execlp(fname, fname, *their_args)
 
 run(sys.argv[1:])
