@@ -40,7 +40,9 @@ def split_argv(argv):
 def run(args):
     my_args, their_args = split_argv(args)
 
-    assert my_args[0] == "run"
+    action = my_args[0]
+    assert action in ["run","path"]
+
     assert len(my_args) == 3
 
     artifact_id, version = my_args[1:]
@@ -55,6 +57,11 @@ def run(args):
     if not isfile(fname):
         fetch(artifact_id, version, fname)
 
-    os.execlp(fname, fname, *their_args)
+    if action == "run":
+        os.execlp(fname, fname, *their_args)
+    elif action == "path":
+        print(fname)
+    else:
+        raise "Unknown action"
 
 run(sys.argv[1:])
