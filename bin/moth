@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+import os, sys
+from os.path import join, isfile
+
+def find_vcs_root(test, dirs=(".git",)):
+    prev, test = None, os.path.abspath(test)
+    while prev != test:
+        if any(os.path.isdir(os.path.join(test, d)) for d in dirs):
+            return test
+        prev, test = test, os.path.abspath(os.path.join(test, os.pardir))
+    raise Exception("No project root found")
+
+def run(args):
+    root_path = find_vcs_root(os.path.dirname(__file__))
+    dot_dir = ".moth"
+
+    target_fn = "foo"
+
+    fname = join(root_path,dot_dir,target_fn)
+
+    assert isfile(fname), "File should exist: " + fname
+
+    print("ok")
+
+    os.execlp(fname, fname, *args)
+
+run(sys.argv[1:])
