@@ -50,10 +50,9 @@
 # Concepts
 
 - coordinates:
-    - `moth/moth-url::https://url.to/path::<object-sha>
-    - `moth/moth-url::file://Users/user/repo::<object-sha>
-    - `moth/moth-s3::<bucket>::<object-sha>`
-    - `moth/moth-gcloud::<bucket>::<object-sha>`
+  - `<provider-spec>:<hash>`
+  - `provider-spec` can be an obj-hash or an alias
+  - an alias is an obj-hash with optional provider-params
 - alias:
     - alternative name for an object. Objects can have multiple aliases, but an alias can only refer to a single object.
     
