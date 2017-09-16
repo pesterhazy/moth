@@ -2,3 +2,57 @@
 - make `moth run` check dependency
 - add manifest (moth.yaml?) to each dependency's directory
 - multi-flle vs single-file dependencies
+
+# Design
+
+- content-addressable storage
+- use object-sha as identifier, instead of [artifact-id version]
+- different sub-projects:
+    - moth-bin
+        - bootstrap
+        - only knows how to retrieve moth-core, then delegates to moth-core
+        - substrate
+        - can be committed to repos (compare how gradle does it)
+        - changes rarely (if ever)
+        - defaults to using PROJECT_ROOT/.moth
+    - moth-core
+        - contains main CLI
+        - version of moth-core is defined explicitly in `moth.yaml`
+        - main operations:
+            - `moth get <coordinates>`
+    - moth-url
+        - k/v store provider for URLs. Supports `file://` and `https://` urls
+        - no authentication
+        - can be used for public repositories
+        - can also be used for private repositories if they disallows "List" operations
+    - moth-github
+        - k/v store provider for Github releases (read only)
+        - unclear: how is this an object store?
+        - used for plugins?
+    - moth-s3
+        - k/v store provider for S3 buckets
+        - GET and PUT
+        - uses awscli under the hood
+        - awscli handles authentication
+    - moth-gcloud
+        - k/v store provider for Google Cloud Storage buckets
+        - GET and PUT
+        - uses gcloud under the hood
+        - glcoud handles authentication
+    
+- investigate if these tools can be in a single monorepo
+- plugins
+    - check how other tools do it
+        - e.g. vagrant, other hashicorp tools
+- coordinate design
+    - URIs?
+
+# Concepts
+
+- coordinates:
+    - `moth/moth-url::https://url.to/path::<object-sha>
+    - `moth/moth-url::file://Users/user/repo::<object-sha>
+    - `moth/moth-s3::<bucket>::<object-sha>`
+    - `moth/moth-gcloud::<bucket>::<object-sha>`
+- alias:
+    - alternative name for an object. Objects can have multiple aliases, but an alias can only refer to a single object.

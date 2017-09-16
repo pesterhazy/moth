@@ -1,0 +1,11 @@
+- moth:
+  - hash: "cafe01"
+- objects:
+  - hash: "cafe02"
+    aliases:
+      - uno
+      - due
+      - tre
+  - hash: "cafe03"
+    aliases:
+      - quark
