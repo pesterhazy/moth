@@ -56,7 +56,7 @@ def run(args):
     manifest = read_manifest(root_path)
     version = str(manifest.get("dependencies", {}).get(artifact_id))
 
-    dot_dir = ".moth"
+    dot_dir = "moth_packages"
 
     target_fn = artifact_id
 

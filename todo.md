@@ -1,0 +1,4 @@
+- add `moth check <dep>` commmand
+- make `moth run` check dependency
+- add manifest (moth.yaml?) to each dependency's directory
+- multi-flle vs single-file dependencies
