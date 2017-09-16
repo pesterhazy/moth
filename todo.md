@@ -56,3 +56,58 @@
     - `moth/moth-gcloud::<bucket>::<object-sha>`
 - alias:
     - alternative name for an object. Objects can have multiple aliases, but an alias can only refer to a single object.
+    
+# Example commands
+
+Get an object using the fully qualified url:
+
+```
+$ moth path moth/moth-s3::acme-moth::cafe01
+
+Retrieving...
+0%
+10%
+100%.
+
+Unpacking...
+
+.moth/objects/cafe/cafe01/contents
+```
+
+This command will print the path to the folder.
+
+Using the provider name:
+
+```
+moth path acme::cafe01
+```
+
+Using the alias:
+
+```
+moth path quark
+```
+
+You can use this from a shell prompt:
+
+```
+cat "$(moth path quark)/hello.txt"
+```
+
+You can also run commands:
+
+```
+moth exec quark hello
+```
+
+There are low-level ("plumbing") commands as well:
+
+```
+moth get --out-file /tmp/hello.txt facade01:cafe01 --repo-base base
+```
+
+Also for uploading:
+
+```
+moth put --in-file /tmp/hello.txt facade0 --repo-base base
+```
