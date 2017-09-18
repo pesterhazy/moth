@@ -1,21 +1,23 @@
 - aliases:
-  - name: moth-core
-    target: moth/moth-core:facade01
+  - name: builtin.base
+    target: builtin.release:facade01
   - name: uno
     target: acme:cafe01
   - name: due
     target: uno
   - name: tre
     target: uno
-  - name: moth-s3
-    target: moth/moth-s3:facade02
-  - name: moth-file
-    target: moth/moth-file:facade03
+  - name: moth.s3
+    target: moth/github:facade02
+    github-path: pesterhazy/moth
+  - name: moth.file
+    target: moth/github:facade03
+    github-path: pesterhazy/moth
   - name: quattro
-    target: moth-s3:cafe02
-    s3-bucket: acme-moth
-    s3-region: eu-west-1
+    target: moth.s3:cafe02
+    moth.s3.bucket: acme-moth
+    moth.s3.region: eu-west-1
   - name: acme
-    target: moth-s3
-    s3-bucket: acme-moth
-    s3-region: eu-west-1
+    target: moth.s3
+    moth.s3.bucket: acme-moth
+    moth.s3.region: eu-west-1
