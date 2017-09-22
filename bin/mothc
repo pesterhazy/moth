@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+mkdir -p srv
+rm -f srv/main.zip
+
+pidkill 8080
+http-server srv &
+sleep 0.3
+
+makezip
+
+bin/mothg "$@"

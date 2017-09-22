@@ -10,8 +10,10 @@ def bootstrap():
 
   sys.stderr.flush()
 
+  contents = urllib2.urlopen(url).read()
+
   with open(ZIP_PATH,"w") as out:
-    out.write(urllib2.urlopen(url).read())
+    out.write(contents)
 
   sys.stderr.write(" done.\n***\n\n")
 
@@ -22,15 +24,13 @@ if os.path.exists(ZIP_PATH):
   sys.path.insert(0, ZIP_PATH)
 
 try:
-  import foo
+  import main
 except ImportError:
   bootstrap()
 
   if os.path.exists(ZIP_PATH):
     sys.path.insert(0, ZIP_PATH)
 
-  import foo
+  import main
 
-foo.bar()
-
-
+main.run()
