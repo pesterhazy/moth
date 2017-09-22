@@ -24,13 +24,13 @@ if os.path.exists(ZIP_PATH):
   sys.path.insert(0, ZIP_PATH)
 
 try:
-  import main
+  import moth.main
 except ImportError:
   bootstrap()
 
   if os.path.exists(ZIP_PATH):
     sys.path.insert(0, ZIP_PATH)
 
-  import main
+  import moth.main
 
-main.run()
+moth.main.run()

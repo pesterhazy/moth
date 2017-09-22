@@ -8,6 +8,6 @@ LIB_PATH = os.path.abspath(os.path.join(SELF_DIR, "..", "main", "lib"))
 if os.path.exists(LIB_PATH):
   sys.path.insert(0, LIB_PATH)
 
-import main
+import moth.main
 
-main.run()
+moth.main.run()
