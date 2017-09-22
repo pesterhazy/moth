@@ -17,6 +17,9 @@ pushd third_party
 zip -r "$target" --exclude='*.pyc' .
 popd
 
-echo
+sha=$(shasum "$target" | cut -f 1 -d " ")
 
-shasum "$target"
+echo "$sha"
+
+sed "s/SHA_GOES_HERE/$sha/" < bin/mothg_template > bin/mothg
+chmod +x bin/mothg

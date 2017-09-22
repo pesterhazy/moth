@@ -2,7 +2,7 @@
 
 import os, sys, urllib2, hashlib
 
-MAIN_SHA = "baf270db9964da2f5f804d1a26ffa788080550e6"
+MAIN_SHA = "SHA_GOES_HERE"
 
 def mkdir_p(path):
     try:
