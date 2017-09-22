@@ -6,9 +6,8 @@ rm -rf .moth
 makezip
 moth put --input-file srv/main.zip --repository file:$PWD/repo
 
-pidkill 8080
-http-server repo &
-
-sleep 0.5
+# pidkill 8080
+# http-server repo &
+# sleep 0.5
 
 bin/mothg "$@"

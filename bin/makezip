@@ -9,6 +9,8 @@ target=$(abspath srv/main.zip)
 
 rm -f "$target"
 
+bin/bump
+
 pushd main/lib
 zip -r "$target" --exclude='*.pyc' .
 popd
