@@ -6,7 +6,7 @@ def bootstrap():
   pass
 
 SELF_DIR = os.path.dirname(__file__)
-ZIP_PATH = os.path.join(SELF_DIR, "..", "out.zip")
+ZIP_PATH = os.path.join(SELF_DIR, "..", "main.zip")
 
 if os.path.exists(ZIP_PATH):
   sys.path.insert(0, ZIP_PATH)
