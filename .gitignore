@@ -4,3 +4,4 @@ main.zip
 *.pyc
 third_party
 .moth
+bin/mothg
