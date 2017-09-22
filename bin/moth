@@ -97,12 +97,13 @@ def get(options):
 
    repo_base = to_repo_base(options.repository)
    target_path = join(repo_base,options.sha[0:3],options.sha)
-   shutil.copy(join(target_path,"contents"), "/dev/stdout")
+   shutil.copy(join(target_path,"contents"), options.output_file or "/dev/stdout")
 
 def run():
    parser = OptionParser()
    parser.add_option("--repository", dest="repository")
    parser.add_option("--input-file", dest="input_file")
+   parser.add_option("--output-file", dest="output_file")
    parser.add_option("--sha", dest="sha")
    (options, args) = parser.parse_args()
 
