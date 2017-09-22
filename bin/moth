@@ -73,19 +73,16 @@ def run(args):
     else:
         raise "Unknown action"
 
-def put(input_file, repository):
-    pass
-
-def run():
-   parser = OptionParser()
-   parser.add_option("--input-file", dest="input_file")
-   parser.add_option("--repository", dest="repository")
-
-   (options, args) = parser.parse_args()
-
-   match = re.match("^file:/*(/.*$)", options.repository)
+def to_repo_base(url):
+   match = re.match("^file:/*(/.*$)", url)
    assert match, "Must be file URL"
-   repo_base = match.group(1)
+   return match.group(1)
+
+def put(options):
+   assert options.repository
+   assert options.input_file
+
+   repo_base = to_repo_base(options.repository)
 
    sha = hashlib.sha1(file(options.input_file).read()).hexdigest()
    target_path = join(repo_base,sha[0:3],sha)
@@ -93,5 +90,32 @@ def run():
    shutil.copy(options.input_file, join(target_path,"contents"))
 
    print sha
+
+def get(options):
+   assert options.repository
+   assert options.sha, "Need to pass a sha"
+
+   repo_base = to_repo_base(options.repository)
+   target_path = join(repo_base,options.sha[0:3],options.sha)
+   shutil.copy(join(target_path,"contents"), "/dev/stdout")
+
+def run():
+   parser = OptionParser()
+   parser.add_option("--repository", dest="repository")
+   parser.add_option("--input-file", dest="input_file")
+   parser.add_option("--sha", dest="sha")
+   (options, args) = parser.parse_args()
+
+   assert len(args) == 1, "Exepcting one command"
+
+   action = args[0]
+
+   if action == "put":
+       put(options)
+   elif action == "get":
+       get(options)
+   else:
+       print "Unknown action"
+       sys.exit(1)
 
 run()
