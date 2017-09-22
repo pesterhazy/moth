@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-pushd main/lib
-target=../../srv/main.zip
+abspath() {
+    python -c "import os,sys; print os.path.abspath(sys.argv[1])" "$1"
+}
+
+target=$(abspath srv/main.zip)
+
 rm -f "$target"
+
+pushd main/lib
+zip -r "$target" --exclude='*.pyc' .
+popd
+
+pushd third_party
 zip -r "$target" --exclude='*.pyc' .
 popd

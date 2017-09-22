@@ -105,7 +105,7 @@ def run():
    parser.add_option("--sha", dest="sha")
    (options, args) = parser.parse_args()
 
-   assert len(args) == 1, "Exepcting exactly one positional argument"
+   assert len(args) == 1, "Expecting exactly one positional argument"
 
    action = args[0]
 
