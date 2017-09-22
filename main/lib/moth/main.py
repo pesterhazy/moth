@@ -78,13 +78,16 @@ def to_repo_base(url):
    assert match, "Must be file URL"
    return match.group(1)
 
+def hash_file(fn):
+    return hashlib.sha1(file(fn).read()).hexdigest()
+
 def put(options):
    assert options.repository
    assert options.input_file
 
    repo_base = to_repo_base(options.repository)
 
-   sha = hashlib.sha1(file(options.input_file).read()).hexdigest()
+   sha = hash_file(options.input_file)
    target_path = join(repo_base,sha[0:3],sha)
    mkdir_p(target_path)
    shutil.copy(options.input_file, join(target_path,"contents"))

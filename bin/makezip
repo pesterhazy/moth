@@ -16,3 +16,7 @@ popd
 pushd third_party
 zip -r "$target" --exclude='*.pyc' .
 popd
+
+echo
+
+shasum "$target"
