@@ -2,5 +2,7 @@
 set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 pushd main/lib
-zip -r ../../srv/main.zip --exclude='*.pyc' .
+target=../../srv/main.zip
+rm -f "$target"
+zip -r "$target" --exclude='*.pyc' .
 popd
