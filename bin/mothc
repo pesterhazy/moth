@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-rm -f main.zip
+rm -rf .moth
 
 mkdir -p srv
 rm -f srv/main.zip

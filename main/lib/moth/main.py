@@ -3,6 +3,8 @@ from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
 
+MOTH_VERSION = "0.100"
+
 def mkdir_p(path):
     try:
         os.makedirs(path)
@@ -113,6 +115,8 @@ def run():
        put(options)
    elif action == "get":
        get(options)
+   elif action == "version":
+       print "moth", MOTH_VERSION
    else:
        print "Unknown action"
        sys.exit(1)

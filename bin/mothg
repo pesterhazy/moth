@@ -2,23 +2,48 @@
 
 import os, sys, urllib2
 
-def bootstrap():
+MAIN_SHA = "504b7c6424e6fa94402786315bb58bc1e504bb8f"
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+
+def find_root(test):
+  prev, test = None, os.path.abspath(test)
+  while prev != test:
+    if os.path.isfile(os.path.join(test, "moth.yaml")):
+      return test
+    prev, test = test, os.path.abspath(os.path.join(test, os.pardir))
+  raise Exception("No project root containing moth.yaml found")
+
+def bootstrap(target_file):
   url = "http://localhost:8080/main.zip"
 
-  sys.stderr.write("*** "  + ZIP_PATH + " not found. Attempting to bootstrap\n***\n")
+  sys.stderr.write("*** "  + target_file + " not found. Attempting to bootstrap\n***\n")
   sys.stderr.write("*** Downloading: " + url + "...")
 
   sys.stderr.flush()
 
   contents = urllib2.urlopen(url).read()
 
-  with open(ZIP_PATH,"w") as out:
+  mkdir_p(os.path.dirname(target_file))
+
+  with open(target_file,"w") as out:
     out.write(contents)
 
   sys.stderr.write(" done.\n***\n\n")
 
-SELF_DIR = os.path.dirname(__file__)
-ZIP_PATH = os.path.abspath(os.path.join(SELF_DIR, "..", "main.zip"))
+def get_zip_path(sha):
+  self_path = os.path.dirname(__file__)
+  root_path = find_root(self_path)
+  return os.path.abspath(os.path.join(root_path, ".moth", "db", sha[0:3], sha, "contents"))
+
+ZIP_PATH = get_zip_path(MAIN_SHA)
 
 if os.path.exists(ZIP_PATH):
   sys.path.insert(0, ZIP_PATH)
@@ -26,7 +51,7 @@ if os.path.exists(ZIP_PATH):
 try:
   import moth.main
 except ImportError:
-  bootstrap()
+  bootstrap(ZIP_PATH)
 
   if os.path.exists(ZIP_PATH):
     sys.path.insert(0, ZIP_PATH)
