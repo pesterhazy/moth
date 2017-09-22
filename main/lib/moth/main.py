@@ -103,7 +103,7 @@ def get(options):
 
 def run():
    parser = OptionParser()
-   parser.add_option("--repository", dest="repository")
+   parser.add_option("--repository", dest="repository", default=os.environ.get("MOTH_REPOSITORY"))
    parser.add_option("--input-file", dest="input_file")
    parser.add_option("--output-file", dest="output_file")
    parser.add_option("--sha", dest="sha")
