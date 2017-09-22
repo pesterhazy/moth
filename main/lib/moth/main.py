@@ -44,7 +44,7 @@ def read_manifest(root_path):
     with open(fname, 'r') as f:
         return yaml.load(f)
 
-def run(args):
+def run__(args):
     my_args, their_args = split_argv(args)
 
     action = my_args[0]
@@ -88,7 +88,7 @@ def put(options):
    repo_base = to_repo_base(options.repository)
 
    sha = hash_file(options.input_file)
-   target_path = join(repo_base,sha[0:3],sha)
+   target_path = join(repo_base,"db",sha[0:3],sha)
    mkdir_p(target_path)
    shutil.copy(options.input_file, join(target_path,"contents"))
 
@@ -99,7 +99,7 @@ def get(options):
    assert options.sha, "Need to pass a sha"
 
    repo_base = to_repo_base(options.repository)
-   target_path = join(repo_base,options.sha[0:3],options.sha)
+   target_path = join(repo_base,"db",options.sha[0:3],options.sha)
    shutil.copy(join(target_path,"contents"), options.output_file or "/dev/stdout")
 
 def run():

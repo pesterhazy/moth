@@ -22,7 +22,8 @@ def find_root(test):
   raise Exception("No project root containing moth.yaml found")
 
 def bootstrap(sha, target_file):
-  url = "http://localhost:8080/main.zip"
+  base_url = "http://localhost:8080"
+  url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
 
   sys.stderr.write("*** "  + target_file + " not found. Attempting to bootstrap\n***\n")
   sys.stderr.write("*** Downloading: " + url + "...")

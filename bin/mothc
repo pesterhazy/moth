@@ -3,13 +3,12 @@ set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 rm -rf .moth
 
-# mkdir -p srv
-# rm -f srv/main.zip
-# makezip
+makezip
+moth put --input-file srv/main.zip --repository file:$PWD/repo
 
 pidkill 8080
-http-server srv &
+http-server repo &
 
-sleep 0.3
+sleep 0.5
 
 bin/mothg "$@"
