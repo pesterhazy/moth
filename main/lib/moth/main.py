@@ -32,16 +32,6 @@ def find_vcs_root(test, dirs=(".git",)):
     raise Exception("No project root found")
 
 
-def fetch(artifact_id, version, target):
-    print "Fetching:", artifact_id, version
-    path = dirname(target)
-    if path:
-        fs.mkdir_p(path)
-        repo_dir = os.path.expanduser("~/.moth-repo")
-        check_call(
-            ["cp", join(repo_dir, artifact_id, version, artifact_id), target])
-
-
 def split_argv(argv):
     if '--' in argv:
         idx = argv.index('--')
@@ -113,15 +103,8 @@ def cat_or_print(fn, cat):
         print fn
 
 
-def show(root_path, options):
-    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+def ensure(sha, repository, target_path):
     assert repository
-
-    sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
-    assert sha, "You need to specify a sha"
-
-    target_path = join(to_db_path(root_path), "db",
-                       sha[0:3], sha)
     content_path = join(target_path, "contents")
 
     if not os.path.isfile(target_path):
@@ -129,6 +112,18 @@ def show(root_path, options):
         from_path = join(repo_base, "db", sha[0:3], sha)
         fs.mkdir_p(target_path)
         copy(join(from_path, "contents"), content_path)
+
+
+def show(root_path, options):
+    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+
+    sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
+    assert sha, "You need to specify a sha"
+
+    target_path = join(to_db_path(root_path), sha[0:3], sha)
+    content_path = join(target_path, "contents")
+
+    ensure(sha, repository, target_path)
 
     if options.workspace or options.find:
         workspace_path = join(target_path, "workspace")
@@ -179,9 +174,15 @@ def is_valid_sha(s):
     return bool(re.match("^[0-9a-f]{40}$", s))
 
 def add(root_path, options):
+    sha = options.sha
     assert options.alias
-    assert options.sha
-    assert is_valid_sha(options.sha)
+    assert sha
+    assert is_valid_sha(sha)
+
+    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+
+    target_path = join(to_db_path(root_path), sha[0:3], sha)
+    ensure(sha, repository,target_path)
 
     manifest = util.read_manifest(root_path)
     if not manifest.get("aliases"):
@@ -190,14 +191,16 @@ def add(root_path, options):
     if not manifest["aliases"].get(options.alias):
         manifest["aliases"][options.alias] = {}
 
-    if manifest["aliases"].get(options.alias,{}).get("sha") == options.sha:
+    if manifest["aliases"].get(options.alias,{}).get("sha") == sha:
         print "Alias already up to date"
-    elif exists:
+        return
+
+    if exists:
         print "Updating alias:", options.alias
     else:
         print "Creating alias:", options.alias
 
-    manifest["aliases"][options.alias]["sha"] = options.sha
+    manifest["aliases"][options.alias]["sha"] = sha
 
     util.write_manifest(manifest, root_path)
 
