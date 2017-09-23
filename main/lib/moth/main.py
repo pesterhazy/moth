@@ -12,6 +12,10 @@ import moth.version
 import util
 import fs
 
+def croak():
+    print '\xe2\x9b\x94\xef\xb8\x8f'
+    sys.exit(1)
+
 
 def find_vcs_root(test, dirs=(".git",)):
     prev, test = None, os.path.abspath(test)
@@ -88,13 +92,21 @@ def copy(from_fn, to_fn):
 
 
 def path(root_path, options):
+    if options.alias:
+        manifest = util.read_manifest(root_path)
+        sha = manifest.get("aliases", {}).get(options.alias, {}).get("sha")
+        assert sha, "Unable to resolve alias"
+    else:
+        sha = options.sha
+        assert sha, "You need to specify a sha"
+
     target_path = join(to_db_path(root_path), "db",
-                       options.sha[0:3], options.sha)
+                       sha[0:3], sha)
     content_path = join(target_path, "contents")
 
     if not os.path.isfile(target_path):
         repo_base = to_repo_base(options.repository)
-        from_path = join(repo_base, "db", options.sha[0:3], options.sha)
+        from_path = join(repo_base, "db", sha[0:3], sha)
         fs.mkdir_p(target_path)
         copy(join(from_path, "contents"), content_path)
 
@@ -137,6 +149,7 @@ def run(base_fn):
     parser.add_option("--input-file", dest="input_file")
     parser.add_option("--output-file", dest="output_file")
     parser.add_option("--sha", dest="sha")
+    parser.add_option("--alias", dest="alias")
     parser.add_option("--find", dest="find")
     parser.add_option("--workspace", dest="workspace", action="store_true")
     (options, args) = parser.parse_args()

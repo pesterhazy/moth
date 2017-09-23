@@ -12,7 +12,7 @@ def find_root(fn):
 
 
 def read_manifest(root_path):
-    fname = join(root_path, "moth.yaml")
+    fname = os.path.join(root_path, "moth.yaml")
 
     with open(fname, 'r') as f:
         return yaml.load(f)
