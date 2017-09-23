@@ -144,6 +144,8 @@ def path(root_path, options):
 
         if options.find:
             find_path = join(workspace_path, options.find)
+
+            assert os.path.exists(find_path), "Specified file does not exist in workspace"
             print find_path
         else:
             print workspace_path

@@ -10,4 +10,4 @@ moth put --input-file srv/main.zip --repository file:$PWD/repo
 # http-server repo &
 # sleep 0.5
 
-bin/mothg "$@"
+exec bin/mothg "$@"

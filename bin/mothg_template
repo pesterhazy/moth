@@ -25,13 +25,12 @@ def bootstrap(sha, target_file):
   base_url = "http://localhost:8080"
   url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
 
-  sys.stderr.write("*** "  + target_file + " not found. Attempting to bootstrap\n***\n")
+  sys.stderr.write("*** "  + target_file + " not found.\n*** Attempting to bootstrap\n***\n")
   sys.stderr.write("*** Downloading: " + url + "...")
 
   sys.stderr.flush()
 
   contents = urllib2.urlopen(url).read()
-  sys.stderr.write("*** Length: " + str(len(contents)) + "\n")
 
   downloaded_sha = hashlib.sha1(contents).hexdigest()
 
