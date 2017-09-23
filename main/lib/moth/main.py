@@ -1,4 +1,4 @@
-import os, sys, yaml, hashlib, re, shutil
+import os, sys, hashlib, re, shutil
 import zipfile, tempfile
 from os.path import join, isfile, dirname
 from subprocess import check_call
@@ -29,41 +29,6 @@ def split_argv(argv):
         return [argv[:idx],argv[idx+1:]]
     else:
         return [argv, []]
-
-def read_manifest(root_path):
-    fname = join(root_path,"moth.yaml")
-
-    with open(fname, 'r') as f:
-        return yaml.load(f)
-
-def run__(args):
-    my_args, their_args = split_argv(args)
-
-    action = my_args[0]
-    assert action in ["run","path"]
-
-    artifact_id = my_args[1]
-
-    root_path = find_vcs_root(dirname(__file__))
-
-    manifest = read_manifest(root_path)
-    version = str(manifest.get("dependencies", {}).get(artifact_id))
-
-    dot_dir = "moth_packages"
-
-    target_fn = artifact_id
-
-    fname = join(root_path,dot_dir,target_fn)
-
-    if not isfile(fname):
-        fetch(artifact_id, version, fname)
-
-    if action == "run":
-        os.execlp(fname, fname, *their_args)
-    elif action == "path":
-        print(fname)
-    else:
-        raise "Unknown action"
 
 def to_repo_base(url):
     match = re.match("^file:/*(/.*$)", url)
