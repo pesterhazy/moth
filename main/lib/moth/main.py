@@ -5,6 +5,7 @@ import re
 import shutil
 import zipfile
 import tempfile
+import yaml
 from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
@@ -61,10 +62,11 @@ def hash_file(fn):
 
 
 def put(options):
-    assert options.repository
+    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+    assert repository
     assert options.input_file
 
-    repo_base = to_repo_base(options.repository)
+    repo_base = to_repo_base(repository)
 
     sha = hash_file(options.input_file)
     target_path = join(repo_base, "db", sha[0:3], sha)
@@ -75,10 +77,11 @@ def put(options):
 
 
 def get(options):
-    assert options.repository
+    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+    assert repository
     assert options.sha, "Need to pass a sha"
 
-    repo_base = to_repo_base(options.repository)
+    repo_base = to_repo_base(repository)
     target_path = join(repo_base, "db", options.sha[0:3], options.sha)
     shutil.copy(join(target_path, "contents"),
                 options.output_file or "/dev/stdout")
@@ -111,6 +114,9 @@ def cat_or_print(fn, cat):
 
 
 def show(root_path, options):
+    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+    assert repository
+
     sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
     assert sha, "You need to specify a sha"
 
@@ -119,7 +125,7 @@ def show(root_path, options):
     content_path = join(target_path, "contents")
 
     if not os.path.isfile(target_path):
-        repo_base = to_repo_base(options.repository)
+        repo_base = to_repo_base(repository)
         from_path = join(repo_base, "db", sha[0:3], sha)
         fs.mkdir_p(target_path)
         copy(join(from_path, "contents"), content_path)
@@ -155,6 +161,15 @@ def show(root_path, options):
     else:
         cat_or_print(content_path, options.cat)
 
+def init(options):
+    assert not os.path.exists("moth.yaml"), "File already exists: moth.yaml"
+
+    assert options.repository
+
+    print yaml.dump({"repositories": [{"url": options.repository}]})
+
+    croak()
+
 
 def help_message():
     print '''
@@ -170,8 +185,7 @@ The following commands are available:
 
 def run(base_fn):
     parser = OptionParser()
-    parser.add_option("--repository", dest="repository",
-                      default=os.environ.get("MOTH_REPOSITORY"))
+    parser.add_option("--repository", dest="repository")
     parser.add_option("--input-file", dest="input_file")
     parser.add_option("--output-file", dest="output_file")
     parser.add_option("--sha", dest="sha")
@@ -188,14 +202,14 @@ def run(base_fn):
     else:
         action = args[0]
 
-    root_path = util.find_root(base_fn)
-
     if action == "put":
         put(options)
     elif action == "get":
         get(options)
     elif action == "show":
-        show(root_path, options)
+        show(util.find_root(base_fn), options)
+    elif action == "init":
+        init(options)
     elif action == "version":
         print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
     elif action in ["default", "help"]:
