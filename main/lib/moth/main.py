@@ -119,7 +119,7 @@ def path(root_path, options):
         mkdir_p(target_path)
         copy(join(from_path,"contents"), content_path)
 
-    if options.find:
+    if options.workspace or options.find:
         workspace_path = join(target_path, "workspace")
 
         if os.path.isfile(workspace_path):
@@ -129,8 +129,11 @@ def path(root_path, options):
             zip_ref.extractall(workspace_path)
             zip_ref.close()
 
-        find_path = join(workspace_path, options.find)
-        print find_path
+        if options.find:
+            find_path = join(workspace_path, options.find)
+            print find_path
+        else:
+            print workspace_path
     else:
         print content_path
 
@@ -141,6 +144,7 @@ def run(base_fn):
     parser.add_option("--output-file", dest="output_file")
     parser.add_option("--sha", dest="sha")
     parser.add_option("--find", dest="find")
+    parser.add_option("--workspace", dest="workspace", action="store_true")
     (options, args) = parser.parse_args()
 
     assert len(args) == 1, "Expecting exactly one positional argument"
