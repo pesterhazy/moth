@@ -194,14 +194,24 @@ def add(root_path, options):
     util.write_manifest(manifest, root_path)
 
 def help_message():
+    # Remember to update README.md as well!
+
     print '''
 usage: moth <command> [args]
 
-The following commands are available:
+Getting started
+
+  init      Initialize moth project in current directory
+  version   Print current moth version
+
+Managing data
+
+  put       Put object
+  add       Add alias
+
+Retrieving data
 
   show      Read object
-  put       Put object
-  version   Print current moth version
 '''[1:-1]
 
 

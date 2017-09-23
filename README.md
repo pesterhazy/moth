@@ -127,11 +127,19 @@ If the aliased object is a zip file, can also refer to files inside the workspac
 ```
 usage: moth <command> [args]
 
-The following commands are available:
+Getting started
+
+  init      Initialize moth project in current directory
+  version   Print current moth version
+
+Managing data
+
+  put       Put object
+  add       Add alias
+
+Retrieving data
 
   show      Read object
-  put       Put object
-  version   Print current moth version
 ```
 
 ## Author
