@@ -91,14 +91,15 @@ def copy(from_fn, to_fn):
     shutil.copy(from_fn, to_fn)
 
 
+def resolve_alias(root_path, alias):
+    manifest = util.read_manifest(root_path)
+    sha = manifest.get("aliases", {}).get(alias, {}).get("sha")
+    assert sha, "Unable to resolve alias"
+    return sha
+
 def path(root_path, options):
-    if options.alias:
-        manifest = util.read_manifest(root_path)
-        sha = manifest.get("aliases", {}).get(options.alias, {}).get("sha")
-        assert sha, "Unable to resolve alias"
-    else:
-        sha = options.sha
-        assert sha, "You need to specify a sha"
+    sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
+    assert sha, "You need to specify a sha"
 
     target_path = join(to_db_path(root_path), "db",
                        sha[0:3], sha)
