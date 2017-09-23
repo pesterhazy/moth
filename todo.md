@@ -1,3 +1,12 @@
+# todo
+
+- clean up main.py
+- merge `moth get` and `moth path`
+- `moth get --alias foo`
+- add backend for http(s)
+
+# old
+
 - add `moth check <dep>` commmand
 - make `moth run` check dependency
 - add manifest (moth.yaml?) to each dependency's directory

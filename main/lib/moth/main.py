@@ -1,19 +1,10 @@
-import os, sys, yaml, errno, hashlib, re, shutil
+import os, sys, yaml, hashlib, re, shutil
 import zipfile, tempfile
 from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
 import moth.version
-import util
-
-def mkdir_p(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
+import util, fs
 
 def find_vcs_root(test, dirs=(".git",)):
     prev, test = None, os.path.abspath(test)
@@ -27,7 +18,7 @@ def fetch(artifact_id, version, target):
     print "Fetching:", artifact_id, version
     path = dirname(target)
     if path:
-        mkdir_p(path)
+        fs.mkdir_p(path)
         repo_dir = os.path.expanduser("~/.moth-repo")
         check_call(["cp", join(repo_dir,artifact_id,version,artifact_id), target])
 
@@ -90,7 +81,7 @@ def put(options):
 
     sha = hash_file(options.input_file)
     target_path = join(repo_base,"db",sha[0:3],sha)
-    mkdir_p(target_path)
+    fs.mkdir_p(target_path)
     shutil.copy(options.input_file, join(target_path,"contents"))
 
     print sha
@@ -119,7 +110,7 @@ def path(root_path, options):
     if not os.path.isfile(target_path):
         repo_base = to_repo_base(options.repository)
         from_path = join(repo_base,"db",options.sha[0:3],options.sha)
-        mkdir_p(target_path)
+        fs.mkdir_p(target_path)
         copy(join(from_path,"contents"), content_path)
 
     if options.workspace or options.find:
@@ -129,7 +120,7 @@ def path(root_path, options):
             assert os.path.isdir(workspace_path)
         else:
             tmp_path = to_tmp_path(root_path)
-            mkdir_p(tmp_path)
+            fs.mkdir_p(tmp_path)
 
             tmp_workspace_path = tempfile.mkdtemp(dir=tmp_path)
             try:
