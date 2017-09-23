@@ -152,6 +152,10 @@ Retrieving data
   show      Read object
 ```
 
-## Author
+## License
 
-Paulus Esterhazy <pesterhazy@gmail.com>
+```
+Copyright © 2017 Paulus Esterhazy <pesterhazy@gmail.com>
+
+Distributed under the Eclipse Public License
+```
