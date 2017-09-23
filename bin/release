@@ -5,6 +5,6 @@ set -x
 
 release_hash="$(cat release.txt)"
 
-git tag "r$release_hash"
+git tag "r$release_hash" || echo "Continuing anyway"
 git push --tags
 hub release create -d -a target/moth_release.zip -a target/moth "r$release_hash"
