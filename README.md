@@ -64,32 +64,32 @@ Often, the dependencies you work with contain multiple files. Moth supports this
 mkdir many
 echo uno > many/one.txt
 echo due > many/two.txt
-( cd many && zip ../many.zip -r * )
+( cd many && zip -X ../many.zip -r * )
 ./moth put --input-file many.zip
 ```
 
-The result is the hash `afcd02847a3a3608ba063fb7cba39755ff216075`. Again moth can print the path to the content:
+The result is the hash `47c06bda08b0ab6c1f1290788024bfecf0d02d06`. Again moth can print the path to the content:
 
 ```shell
-./moth show --sha afcd02847a3a3608ba063fb7cba39755ff216075
+./moth show --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06
 ```
 
 But you can also find and access paths to files within the workspace:
 
 ```shell
-./moth show --sha afcd02847a3a3608ba063fb7cba39755ff216075 --find one.txt
+./moth show --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06 --find one.txt
 ```
 
 Which prints:
 
 ```
-/home/user/.moth/db/db/afe/afcd02847a3a3608ba063fb7cba39755ff216075/workspace/one.txt
+/home/user/.moth/db/db/afe/47c06bda08b0ab6c1f1290788024bfecf0d02d06/workspace/one.txt
 ```
 
 Or
 
 ```shell
-./moth show --sha afcd02847a3a3608ba063fb7cba39755ff216075 --find one.txt --cat
+./moth show --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06 --find one.txt --cat
 ```
 
 which prints:
@@ -103,7 +103,7 @@ When used with the `--find` flag, moth automatically extract zip files in a loca
 SHA1 hashes are long enough to ensure that hash collisions are unlikely. But they're also difficult to remember, so moth allows you to refer to objects through aliases. First define the alias in `moth.json`:
 
 ```shell
-./moth add --alias many --sha afcd02847a3a3608ba063fb7cba39755ff216075
+./moth add --alias many --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06
 ```
 
 Now you can refer to the object using an alias:
