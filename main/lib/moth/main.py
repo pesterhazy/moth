@@ -104,7 +104,7 @@ def resolve_alias(root_path, alias):
     return sha
 
 
-def path(root_path, options):
+def show(root_path, options):
     sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
     assert sha, "You need to specify a sha"
 
@@ -147,7 +147,10 @@ def path(root_path, options):
         else:
             print workspace_path
     else:
-        print content_path
+        if options.cat:
+            shutil.copyfileobj(file(content_path, "rb"), sys.stdout)
+        else:
+            print content_path
 
 
 def help_message():
@@ -156,7 +159,7 @@ usage: moth <command> [args]
 
 The following commands are available:
 
-  path      Read object
+  show      Read object
   put       Put object
   version   Print current moth version
 '''[1:-1]
@@ -172,6 +175,7 @@ def run(base_fn):
     parser.add_option("--alias", dest="alias")
     parser.add_option("--find", dest="find")
     parser.add_option("--workspace", dest="workspace", action="store_true")
+    parser.add_option("--cat", dest="cat", action="store_true")
     (options, args) = parser.parse_args()
 
     if len(args) == 0:
@@ -187,8 +191,8 @@ def run(base_fn):
         put(options)
     elif action == "get":
         get(options)
-    elif action == "path":
-        path(root_path, options)
+    elif action == "show":
+        show(root_path, options)
     elif action == "version":
         print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
     elif action in ["default", "help"]:
