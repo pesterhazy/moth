@@ -175,6 +175,24 @@ def init(options):
     print
     print "Initial repository:", options.repository
 
+def is_valid_sha(s):
+    return bool(re.match("^[0-9a-f]{40}$", s))
+
+def add(root_path, options):
+    assert options.alias
+    assert options.sha
+    assert is_valid_sha(options.sha)
+
+    manifest = util.read_manifest(root_path)
+    if not manifest.get("aliases"):
+        mainfest["aliases"] = {}
+    if not manifest["aliases"].get(options.alias):
+        manifest["aliases"][options.alias] = {}
+
+    manifest["aliases"][options.alias]["sha"] = options.sha
+
+    util.write_manifest(manifest, root_path)
+
 def help_message():
     print '''
 usage: moth <command> [args]
@@ -214,6 +232,8 @@ def run(base_fn):
         show(util.find_root(base_fn), options)
     elif action == "init":
         init(options)
+    elif action == "add":
+        add(util.find_root(base_fn), options)
     elif action == "version":
         print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
     elif action in ["default", "help"]:

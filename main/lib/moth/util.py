@@ -16,3 +16,10 @@ def read_manifest(root_path):
 
     with open(fname, 'r') as f:
         return json.load(f)
+
+
+def write_manifest(data, root_path):
+    fname = os.path.join(root_path, "moth.json")
+
+    with open(fname, 'w') as out:
+        json.dump(data, out, indent=4, separators=(',', ': '))
