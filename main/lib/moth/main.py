@@ -124,7 +124,7 @@ def path(root_path, options):
 
         if os.path.isfile(workspace_path):
             assert os.path.isdir(workspace_path)
-
+        else:
             zip_ref = zipfile.ZipFile(content_path, 'r')
             zip_ref.extractall(workspace_path)
             zip_ref.close()
