@@ -17,7 +17,7 @@ Simple installation is one of moth's goals. No global installation is necessary.
 To add moth to a new project, simply download the current `moth` binary to your project directory:
 
 ```shell
-bash -c 'curl -fsSLo moth https://github.com/pesterhazy/moth/releases/download/r${1}/moth && chmod +x moth' -- a62d2a621be13d88741234bf5ac51fabb56f911c
+bash -c 'curl -fsSLo moth https://github.com/pesterhazy/moth/releases/download/r${1}/moth && chmod +x moth' -- 82b30cae0f93a0d653e8dff5b02493725d259684
 ```
 
 ## Tutorial
