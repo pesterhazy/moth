@@ -1,8 +1,6 @@
 # todo
 
 - clean up main.py
-- merge `moth get` and `moth path`
-- `moth get --alias foo`
 - add backend for http(s)
 - set MAIN_SHA in moth.yaml
 

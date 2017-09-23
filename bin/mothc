@@ -3,8 +3,7 @@ set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 rm -rf .moth
 
-makezip
-makezip2
+bin/build
 
 echo
 
