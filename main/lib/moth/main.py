@@ -185,7 +185,7 @@ def add(root_path, options):
 
     manifest = util.read_manifest(root_path)
     if not manifest.get("aliases"):
-        mainfest["aliases"] = {}
+        manifest["aliases"] = {}
     if not manifest["aliases"].get(options.alias):
         manifest["aliases"][options.alias] = {}
 
