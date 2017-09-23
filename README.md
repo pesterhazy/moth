@@ -83,7 +83,7 @@ But you can also find and access paths to files within the workspace:
 Which prints:
 
 ```
-/home/user/.moth/db/db/a0e/afcd02847a3a3608ba063fb7cba39755ff216075/workspace/one.txt
+/home/user/.moth/db/db/afe/afcd02847a3a3608ba063fb7cba39755ff216075/workspace/one.txt
 ```
 
 Or
