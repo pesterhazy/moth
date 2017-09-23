@@ -16,8 +16,9 @@ To add moth to a new project, simply download the current `moth` binary to your 
 ```
 $ mkdir myproject
 $ cd myproject
+$ touch moth.yaml
 $ bash -c 'curl -fsSLo moth https://github.com/pesterhazy/moth/releases/download/r${1}/moth && chmod +x moth' -- a62d2a621be13d88741234bf5ac51fabb56f911c
-# ./moth version
+$ ./moth version
 ```
 
 ## Author
