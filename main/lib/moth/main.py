@@ -186,8 +186,16 @@ def add(root_path, options):
     manifest = util.read_manifest(root_path)
     if not manifest.get("aliases"):
         manifest["aliases"] = {}
+    exists = bool(manifest["aliases"].get(options.alias))
     if not manifest["aliases"].get(options.alias):
         manifest["aliases"][options.alias] = {}
+
+    if manifest["aliases"].get(options.alias,{}).get("sha") == options.sha:
+        print "Alias already up to date"
+    elif exists:
+        print "Updating alias:", options.alias
+    else:
+        print "Creating alias:", options.alias
 
     manifest["aliases"][options.alias]["sha"] = options.sha
 
