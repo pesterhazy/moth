@@ -1,6 +1,6 @@
 moth_packages
 repo
-main.zip
+srv
 *.pyc
 third_party
 .moth

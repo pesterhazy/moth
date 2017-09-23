@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# start our_temp_dir: v1
+our_temp_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'our_temp_dir')
+function cleanup_temp_dir() { rm -rf "$our_temp_dir" ; } && trap "cleanup_temp_dir" EXIT
+# end our_temp_dir
+
+out="$1"
+shift
+in="$1"
+shift
+
+if ! [[ -d "$in" ]]; then
+    echo Not a directory: "$in"
+    exit 1
+fi
+
+pushd "$in">/dev/null
+zip -X "$our_temp_dir/1.zip" "$@" *
+popd>/dev/null
+
+stripzip "$our_temp_dir/1.zip"
+mv "$our_temp_dir/1.zip" "$out"

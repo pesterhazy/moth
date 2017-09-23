@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+abspath() {
+    python -c "import os,sys; print os.path.abspath(sys.argv[1])" "$1"
+}
+
+target=$(abspath srv/bar.zip)
+
+script/zipdir "$target" example/bar

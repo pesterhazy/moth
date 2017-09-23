@@ -104,6 +104,13 @@ def resolve_alias(root_path, alias):
     return sha
 
 
+def cat_or_print(fn, cat):
+    if cat:
+        shutil.copyfileobj(file(fn, "rb"), sys.stdout)
+    else:
+        print fn
+
+
 def show(root_path, options):
     sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
     assert sha, "You need to specify a sha"
@@ -143,14 +150,11 @@ def show(root_path, options):
 
             assert os.path.exists(
                 find_path), "Specified file does not exist in workspace"
-            print find_path
+            cat_or_print(find_path, options.cat)
         else:
             print workspace_path
     else:
-        if options.cat:
-            shutil.copyfileobj(file(content_path, "rb"), sys.stdout)
-        else:
-            print content_path
+        cat_or_print(content_path, options.cat)
 
 
 def help_message():

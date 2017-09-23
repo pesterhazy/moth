@@ -12,12 +12,14 @@ rm -f "$target"
 bin/bump
 
 pushd main/lib
-zip -r "$target" --exclude='*.pyc' .
+zip -X -r "$target" --exclude='*.pyc' .
 popd
 
 pushd third_party
-zip -r "$target" --exclude='*.pyc' .
+zip -X -r "$target" --exclude='*.pyc' .
 popd
+
+stripzip "$target"
 
 sha=$(shasum "$target" | cut -f 1 -d " ")
 
