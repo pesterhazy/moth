@@ -27,8 +27,8 @@ def fetch(artifact_id, version, target):
     path = dirname(target)
     if path:
         mkdir_p(path)
-    repo_dir = os.path.expanduser("~/.moth-repo")
-    check_call(["cp", join(repo_dir,artifact_id,version,artifact_id), target])
+        repo_dir = os.path.expanduser("~/.moth-repo")
+        check_call(["cp", join(repo_dir,artifact_id,version,artifact_id), target])
 
 def split_argv(argv):
     if '--' in argv:
@@ -74,72 +74,72 @@ def run__(args):
         raise "Unknown action"
 
 def to_repo_base(url):
-   match = re.match("^file:/*(/.*$)", url)
-   assert match, "Must be file URL"
-   return match.group(1)
+    match = re.match("^file:/*(/.*$)", url)
+    assert match, "Must be file URL"
+    return match.group(1)
 
 def hash_file(fn):
     return hashlib.sha1(file(fn).read()).hexdigest()
 
 def put(options):
-   assert options.repository
-   assert options.input_file
+    assert options.repository
+    assert options.input_file
 
-   repo_base = to_repo_base(options.repository)
+    repo_base = to_repo_base(options.repository)
 
-   sha = hash_file(options.input_file)
-   target_path = join(repo_base,"db",sha[0:3],sha)
-   mkdir_p(target_path)
-   shutil.copy(options.input_file, join(target_path,"contents"))
+    sha = hash_file(options.input_file)
+    target_path = join(repo_base,"db",sha[0:3],sha)
+    mkdir_p(target_path)
+    shutil.copy(options.input_file, join(target_path,"contents"))
 
-   print sha
+    print sha
 
 def get(options):
-   assert options.repository
-   assert options.sha, "Need to pass a sha"
+    assert options.repository
+    assert options.sha, "Need to pass a sha"
 
-   repo_base = to_repo_base(options.repository)
-   target_path = join(repo_base,"db",options.sha[0:3],options.sha)
-   shutil.copy(join(target_path,"contents"), options.output_file or "/dev/stdout")
+    repo_base = to_repo_base(options.repository)
+    target_path = join(repo_base,"db",options.sha[0:3],options.sha)
+    shutil.copy(join(target_path,"contents"), options.output_file or "/dev/stdout")
 
 def to_db_path(root_path):
-   return join(root_path, ".moth", "db")
+    return join(root_path, ".moth", "db")
 
 def copy(from_fn, to_fn):
-   shutil.copy(from_fn, to_fn)
+    shutil.copy(from_fn, to_fn)
 
 def path(root_path, options):
-   target_path = join(to_db_path(root_path),"db",options.sha[0:3],options.sha)
+    target_path = join(to_db_path(root_path),"db",options.sha[0:3],options.sha)
 
-   if not os.path.isfile(target_path):
-      repo_base = to_repo_base(options.repository)
-      from_path = join(repo_base,"db",options.sha[0:3],options.sha)
-      mkdir_p(dirname(target_path))
-      copy(join(from_path,"contents"), target_path)
+    if not os.path.isfile(target_path):
+        repo_base = to_repo_base(options.repository)
+        from_path = join(repo_base,"db",options.sha[0:3],options.sha)
+        mkdir_p(dirname(target_path))
+        copy(join(from_path,"contents"), target_path)
 
-   print target_path
+    print target_path
 
 def run(base_fn):
-   parser = OptionParser()
-   parser.add_option("--repository", dest="repository", default=os.environ.get("MOTH_REPOSITORY"))
-   parser.add_option("--input-file", dest="input_file")
-   parser.add_option("--output-file", dest="output_file")
-   parser.add_option("--sha", dest="sha")
-   (options, args) = parser.parse_args()
+    parser = OptionParser()
+    parser.add_option("--repository", dest="repository", default=os.environ.get("MOTH_REPOSITORY"))
+    parser.add_option("--input-file", dest="input_file")
+    parser.add_option("--output-file", dest="output_file")
+    parser.add_option("--sha", dest="sha")
+    (options, args) = parser.parse_args()
 
-   assert len(args) == 1, "Expecting exactly one positional argument"
+    assert len(args) == 1, "Expecting exactly one positional argument"
 
-   root_path = util.find_root(base_fn)
-   action = args[0]
+    root_path = util.find_root(base_fn)
+    action = args[0]
 
-   if action == "put":
-       put(options)
-   elif action == "get":
-       get(options)
-   elif action == "path":
-       path(root_path, options)
-   elif action == "version":
-       print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
-   else:
-       print "Unknown action"
-       sys.exit(1)
+    if action == "put":
+        put(options)
+    elif action == "get":
+        get(options)
+    elif action == "path":
+        path(root_path, options)
+    elif action == "version":
+        print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
+    else:
+        print "Unknown action"
+        sys.exit(1)
