@@ -1,4 +1,5 @@
 import os, sys, yaml, errno, hashlib, re, shutil
+import zipfile
 from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
@@ -110,14 +111,28 @@ def copy(from_fn, to_fn):
 
 def path(root_path, options):
     target_path = join(to_db_path(root_path),"db",options.sha[0:3],options.sha)
+    content_path = join(target_path, "contents")
 
     if not os.path.isfile(target_path):
         repo_base = to_repo_base(options.repository)
         from_path = join(repo_base,"db",options.sha[0:3],options.sha)
-        mkdir_p(dirname(target_path))
-        copy(join(from_path,"contents"), target_path)
+        mkdir_p(target_path)
+        copy(join(from_path,"contents"), content_path)
 
-    print target_path
+    if options.find:
+        workspace_path = join(target_path, "workspace")
+
+        if os.path.isfile(workspace_path):
+            assert os.path.isdir(workspace_path)
+
+            zip_ref = zipfile.ZipFile(content_path, 'r')
+            zip_ref.extractall(workspace_path)
+            zip_ref.close()
+
+        find_path = join(workspace_path, options.find)
+        print find_path
+    else:
+        print content_path
 
 def run(base_fn):
     parser = OptionParser()
@@ -125,6 +140,7 @@ def run(base_fn):
     parser.add_option("--input-file", dest="input_file")
     parser.add_option("--output-file", dest="output_file")
     parser.add_option("--sha", dest="sha")
+    parser.add_option("--find", dest="find")
     (options, args) = parser.parse_args()
 
     assert len(args) == 1, "Expecting exactly one positional argument"
