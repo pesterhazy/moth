@@ -25,6 +25,8 @@ sha=$(shasum "$target" | cut -f 1 -d " ")
 
 echo "$sha"
 
+echo "$sha" > release.txt
+
 sed "s/SHA_GOES_HERE/$sha/" < bin/mothg_template > target/moth
 sed "s/SHA_GOES_HERE/$sha/" < bin/mothg_template > bin/mothg
 chmod +x bin/mothg

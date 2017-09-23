@@ -5,5 +5,5 @@ set -x
 
 rm -rf target
 
-makezip
 makezip2
+makezip

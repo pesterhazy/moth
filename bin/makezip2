@@ -5,6 +5,8 @@ abspath() {
     python -c "import os,sys; print os.path.abspath(sys.argv[1])" "$1"
 }
 
+mkdir -p target
+
 target=$(abspath target/bar.zip)
 
 script/zipdir "$target" example/bar
