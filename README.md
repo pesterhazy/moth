@@ -1,14 +1,26 @@
 ## Synopsis
 
-`moth` is a simple package manager. It's based on the following principles:
+`moth` is a simple dependency manager based on the following principles:
 
 - Content-addressable storage: use sha hashes to identify dependencies
 - Project-centric: works from your project directory (Git repo)
 - Private: allows non-public, authenticated dependencies
-- Cross-platform: works on Linux and macOS
+- Cross-platform: works on Linux and macOS (with Windows as a possibility)
 - Self-contained: requires no dependencies
 
-Expect more here soon
+To keep things simple, the project defines a number of non-goals:
+
+- No transitive dependencies, in contrast to npm, maven etc.
+- No integration with git, in contrast to alternatives like [git-annex](https://git-annex.branchable.com/) and [git-lfs](https://git-lfs.github.com/) (although this could be added as a separate project)
+
+## Maturity
+
+Moth is currently in **early development** so expect breaking changes. Essential features are not implemented yet:
+
+- HTTP/HTTPS backend
+- S3 backend
+- Google Cloud Storage backend
+- Authentication
 
 ## Getting started
 
