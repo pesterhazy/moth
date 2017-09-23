@@ -22,7 +22,7 @@ bash -c 'curl -fsSLo moth https://github.com/pesterhazy/moth/releases/download/r
 
 ## Tutorial
 
-Start by configuring the first repository. Let's use a local file-based repository:
+Start by configuring a repository. The `moth init` command expects a repository URL and creates a fresh `moth.yaml` in the current directory:
 
 ```shell
 ./moth init --repository "file:$HOME/.moth-local"
@@ -36,11 +36,9 @@ echo "Bom dia" > hello.txt
 ./moth put --input-file hello.txt
 ```
 
+This writes a file to the `~/.moth-local` folder. Local filesystem-based repositories are not as useful as remote repositories, but they are easier to so we'll use one in this tutorial. The process for uploading to a cloud storage service is similar.
 
-
-This writes a file to the `~/.moth-local` folder, but the process for uploading to a cloud storage service is similar.
-
-Note that this command writes back the SHA hash of the content you uploaded:
+Note that `moth put` prints the SHA hash of the content you just uploaded to the terminal:
 
 ```
 504b7c6424e6fa94402786315bb58bc1e504bb8f
