@@ -173,7 +173,7 @@ def init(options):
 def is_valid_sha(s):
     return bool(re.match("^[0-9a-f]{40}$", s))
 
-def add(root_path, options):
+def action_alias(root_path, options):
     sha = options.sha
     assert options.alias
     assert sha
@@ -218,7 +218,7 @@ Getting started
 Managing data
 
   put       Put object
-  add       Add alias
+  alias     Add or update alias
 
 Retrieving data
 
@@ -253,8 +253,8 @@ def run(base_fn):
         show(util.find_root(base_fn), options)
     elif action == "init":
         init(options)
-    elif action == "add":
-        add(util.find_root(base_fn), options)
+    elif action == "alias":
+        action_alias(util.find_root(base_fn), options)
     elif action == "version":
         print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
     elif action in ["default", "help"]:

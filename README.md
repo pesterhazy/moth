@@ -103,7 +103,7 @@ When used with the `--find` flag, moth automatically extract zip files in a loca
 SHA1 hashes are long enough to ensure that hash collisions are unlikely. But they're also difficult to remember, so moth allows you to refer to objects through aliases. First define the alias in `moth.json`:
 
 ```shell
-./moth add --alias many --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06
+./moth alias --alias many --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06
 ```
 
 Now you can refer to the object using an alias:
@@ -135,7 +135,7 @@ Getting started
 Managing data
 
   put       Put object
-  add       Add alias
+  alias     Add or update alias
 
 Retrieving data
 
