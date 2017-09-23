@@ -5,7 +5,9 @@ abspath() {
     python -c "import os,sys; print os.path.abspath(sys.argv[1])" "$1"
 }
 
-target=$(abspath target/moth.zip)
+mkdir -p target
+
+target=$(abspath target/moth_release.zip)
 
 rm -f "$target"
 
@@ -23,5 +25,6 @@ sha=$(shasum "$target" | cut -f 1 -d " ")
 
 echo "$sha"
 
+sed "s/SHA_GOES_HERE/$sha/" < bin/mothg_template > target/moth
 sed "s/SHA_GOES_HERE/$sha/" < bin/mothg_template > bin/mothg
 chmod +x bin/mothg

@@ -8,7 +8,7 @@ bin/build
 echo
 
 echo -n "main.zip: "
-moth put --input-file target/moth.zip --repository file:$PWD/repo
+moth put --input-file target/moth_release.zip --repository file:$PWD/repo
 echo -n "foo: "
 moth put --input-file example/foo --repository file:$PWD/repo
 echo -n "bar: "
