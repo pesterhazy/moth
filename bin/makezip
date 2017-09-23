@@ -5,7 +5,7 @@ abspath() {
     python -c "import os,sys; print os.path.abspath(sys.argv[1])" "$1"
 }
 
-target=$(abspath srv/main.zip)
+target=$(abspath target/moth.zip)
 
 rm -f "$target"
 

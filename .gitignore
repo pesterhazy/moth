@@ -1,6 +1,6 @@
 moth_packages
 repo
-srv
+target
 *.pyc
 third_party
 .moth
