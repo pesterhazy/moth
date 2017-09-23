@@ -1,5 +1,5 @@
 import os, sys, yaml, errno, hashlib, re, shutil
-import zipfile
+import zipfile, tempfile
 from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
@@ -106,6 +106,9 @@ def get(options):
 def to_db_path(root_path):
     return join(root_path, ".moth", "db")
 
+def to_tmp_path(root_path):
+    return join(root_path, ".moth", "tmp")
+
 def copy(from_fn, to_fn):
     shutil.copy(from_fn, to_fn)
 
@@ -125,9 +128,19 @@ def path(root_path, options):
         if os.path.isfile(workspace_path):
             assert os.path.isdir(workspace_path)
         else:
-            zip_ref = zipfile.ZipFile(content_path, 'r')
-            zip_ref.extractall(workspace_path)
-            zip_ref.close()
+            tmp_path = to_tmp_path(root_path)
+            mkdir_p(tmp_path)
+
+            tmp_workspace_path = tempfile.mkdtemp(dir=tmp_path)
+            try:
+                zip_ref = zipfile.ZipFile(content_path, 'r')
+                zip_ref.extractall(tmp_workspace_path)
+                zip_ref.close()
+                shutil.move(tmp_workspace_path, workspace_path)
+                tmp_workspace_path = None
+            finally:
+                if tmp_workspace_path:
+                    shutil.rmtree(tmp_workspace_path)
 
         if options.find:
             find_path = join(workspace_path, options.find)
