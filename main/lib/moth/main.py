@@ -5,7 +5,7 @@ import re
 import shutil
 import zipfile
 import tempfile
-import yaml
+import json
 from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
@@ -162,11 +162,12 @@ def show(root_path, options):
         cat_or_print(content_path, options.cat)
 
 def init(options):
-    assert not os.path.exists("moth.yaml"), "File already exists: moth.yaml"
+    assert not os.path.exists("moth.json"), "File already exists: moth.json"
 
     assert options.repository
 
-    print yaml.dump({"repositories": [{"url": options.repository}]})
+    print json.dumps({"repositories": [{"url": options.repository}]},
+                     indent=4, separators=(',', ': '))
 
     croak()
 

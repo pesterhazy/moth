@@ -1,18 +1,18 @@
 import os.path
-import yaml
+import json
 
 
 def find_root(fn):
     prev, fn = None, os.path.abspath(fn)
     while prev != fn:
-        if os.path.isfile(os.path.join(fn, "moth.yaml")):
+        if os.path.isfile(os.path.join(fn, "moth.json")):
             return fn
         prev, fn = fn, os.path.abspath(os.path.join(fn, os.pardir))
-    raise Exception("No project root containing moth.yaml found")
+    raise Exception("No project root containing moth.json found")
 
 
 def read_manifest(root_path):
-    fname = os.path.join(root_path, "moth.yaml")
+    fname = os.path.join(root_path, "moth.json")
 
     with open(fname, 'r') as f:
-        return yaml.load(f)
+        return json.load(f)

@@ -17,9 +17,8 @@ Simple installation is one of moth's goals. No global installation is necessary.
 To add moth to a new project, simply download the current `moth` binary to your project directory:
 
 ```shell
-touch moth.yaml
 bash -c 'curl -fsSLo moth https://github.com/pesterhazy/moth/releases/download/r${1}/moth && chmod +x moth' -- a62d2a621be13d88741234bf5ac51fabb56f911c
-./moth version
+./moth init
 ```
 
 ## Tutorial
@@ -101,14 +100,10 @@ uno
 
 When used with the `--find` flag, moth automatically extract zip files in a local folder. This makes it easy to refer to workspace contents from other scripts.
 
-SHA1 hashes are long enough to ensure that hash collisions are unlikely. But they're also difficult to remember, so moth allows you to refer to objects through aliases. First define the alias in `moth.yaml`:
+SHA1 hashes are long enough to ensure that hash collisions are unlikely. But they're also difficult to remember, so moth allows you to refer to objects through aliases. First define the alias in `moth.json`:
 
 ```shell
-cat > moth.yaml <<EOF
-aliases:
-  many:
-    sha: a0e1119b1dc49f08d79072c13efc81047024047c
-EOF
+./moth add --alias many --sha a0e1119b1dc49f08d79072c13efc81047024047c
 ```
 
 Now you can refer to the object using an alias:
