@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+pipenv run autopep8 --in-place $(git ls-files \*.py) bin/moth bin/mothg_template

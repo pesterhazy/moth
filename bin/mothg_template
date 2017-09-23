@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 
-import os, sys, urllib2, hashlib
+import os
+import sys
+import urllib2
+import hashlib
 
 MAIN_SHA = "SHA_GOES_HERE"
+
 
 def mkdir_p(path):
     try:
@@ -13,55 +17,61 @@ def mkdir_p(path):
         else:
             raise
 
+
 def find_root(fn):
-  prev, fn = None, os.path.abspath(fn)
-  while prev != fn:
-    if os.path.isfile(os.path.join(fn, "moth.yaml")):
-      return fn
-    prev, fn = fn, os.path.abspath(os.path.join(fn, os.pardir))
-  raise Exception("No project root containing moth.yaml found")
+    prev, fn = None, os.path.abspath(fn)
+    while prev != fn:
+        if os.path.isfile(os.path.join(fn, "moth.yaml")):
+            return fn
+        prev, fn = fn, os.path.abspath(os.path.join(fn, os.pardir))
+    raise Exception("No project root containing moth.yaml found")
+
 
 def bootstrap(sha, target_file):
-  base_url = "http://localhost:8080"
-  url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
+    base_url = "http://localhost:8080"
+    url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
 
-  sys.stderr.write("*** "  + target_file + " not found.\n*** Attempting to bootstrap\n***\n")
-  sys.stderr.write("*** Downloading: " + url + "...")
+    sys.stderr.write("*** " + target_file +
+                     " not found.\n*** Attempting to bootstrap\n***\n")
+    sys.stderr.write("*** Downloading: " + url + "...")
 
-  sys.stderr.flush()
+    sys.stderr.flush()
 
-  contents = urllib2.urlopen(url).read()
+    contents = urllib2.urlopen(url).read()
 
-  downloaded_sha = hashlib.sha1(contents).hexdigest()
+    downloaded_sha = hashlib.sha1(contents).hexdigest()
 
-  if downloaded_sha != sha:
-    raise Exception("Downloaded sha " + downloaded_sha + " does not match expected value " + sha)
+    if downloaded_sha != sha:
+        raise Exception("Downloaded sha " + downloaded_sha +
+                        " does not match expected value " + sha)
 
-  mkdir_p(os.path.dirname(target_file))
+    mkdir_p(os.path.dirname(target_file))
 
-  with open(target_file,"w") as out:
-    out.write(contents)
+    with open(target_file, "w") as out:
+        out.write(contents)
 
-  sys.stderr.write(" done.\n***\n\n")
+    sys.stderr.write(" done.\n***\n\n")
+
 
 def get_zip_path(sha):
-  self_path = os.path.dirname(__file__)
-  root_path = find_root(self_path)
-  return os.path.abspath(os.path.join(root_path, ".moth", "db", sha[0:3], sha, "contents"))
+    self_path = os.path.dirname(__file__)
+    root_path = find_root(self_path)
+    return os.path.abspath(os.path.join(root_path, ".moth", "db", sha[0:3], sha, "contents"))
+
 
 ZIP_PATH = get_zip_path(MAIN_SHA)
 
 if os.path.exists(ZIP_PATH):
-  sys.path.insert(0, ZIP_PATH)
-
-try:
-  import moth.main
-except ImportError:
-  bootstrap(MAIN_SHA, ZIP_PATH)
-
-  if os.path.exists(ZIP_PATH):
     sys.path.insert(0, ZIP_PATH)
 
-  import moth.main
+try:
+    import moth.main
+except ImportError:
+    bootstrap(MAIN_SHA, ZIP_PATH)
+
+    if os.path.exists(ZIP_PATH):
+        sys.path.insert(0, ZIP_PATH)
+
+    import moth.main
 
 moth.main.run(os.path.dirname(__file__))

@@ -1,10 +1,17 @@
-import os, sys, hashlib, re, shutil
-import zipfile, tempfile
+import os
+import sys
+import hashlib
+import re
+import shutil
+import zipfile
+import tempfile
 from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
 import moth.version
-import util, fs
+import util
+import fs
+
 
 def find_vcs_root(test, dirs=(".git",)):
     prev, test = None, os.path.abspath(test)
@@ -14,29 +21,35 @@ def find_vcs_root(test, dirs=(".git",)):
         prev, test = test, os.path.abspath(os.path.join(test, os.pardir))
     raise Exception("No project root found")
 
+
 def fetch(artifact_id, version, target):
     print "Fetching:", artifact_id, version
     path = dirname(target)
     if path:
         fs.mkdir_p(path)
         repo_dir = os.path.expanduser("~/.moth-repo")
-        check_call(["cp", join(repo_dir,artifact_id,version,artifact_id), target])
+        check_call(
+            ["cp", join(repo_dir, artifact_id, version, artifact_id), target])
+
 
 def split_argv(argv):
     if '--' in argv:
         idx = argv.index('--')
 
-        return [argv[:idx],argv[idx+1:]]
+        return [argv[:idx], argv[idx + 1:]]
     else:
         return [argv, []]
+
 
 def to_repo_base(url):
     match = re.match("^file:/*(/.*$)", url)
     assert match, "Must be file URL"
     return match.group(1)
 
+
 def hash_file(fn):
     return hashlib.sha1(file(fn).read()).hexdigest()
+
 
 def put(options):
     assert options.repository
@@ -45,38 +58,45 @@ def put(options):
     repo_base = to_repo_base(options.repository)
 
     sha = hash_file(options.input_file)
-    target_path = join(repo_base,"db",sha[0:3],sha)
+    target_path = join(repo_base, "db", sha[0:3], sha)
     fs.mkdir_p(target_path)
-    shutil.copy(options.input_file, join(target_path,"contents"))
+    shutil.copy(options.input_file, join(target_path, "contents"))
 
     print sha
+
 
 def get(options):
     assert options.repository
     assert options.sha, "Need to pass a sha"
 
     repo_base = to_repo_base(options.repository)
-    target_path = join(repo_base,"db",options.sha[0:3],options.sha)
-    shutil.copy(join(target_path,"contents"), options.output_file or "/dev/stdout")
+    target_path = join(repo_base, "db", options.sha[0:3], options.sha)
+    shutil.copy(join(target_path, "contents"),
+                options.output_file or "/dev/stdout")
+
 
 def to_db_path(root_path):
     return join(root_path, ".moth", "db")
 
+
 def to_tmp_path(root_path):
     return join(root_path, ".moth", "tmp")
+
 
 def copy(from_fn, to_fn):
     shutil.copy(from_fn, to_fn)
 
+
 def path(root_path, options):
-    target_path = join(to_db_path(root_path),"db",options.sha[0:3],options.sha)
+    target_path = join(to_db_path(root_path), "db",
+                       options.sha[0:3], options.sha)
     content_path = join(target_path, "contents")
 
     if not os.path.isfile(target_path):
         repo_base = to_repo_base(options.repository)
-        from_path = join(repo_base,"db",options.sha[0:3],options.sha)
+        from_path = join(repo_base, "db", options.sha[0:3], options.sha)
         fs.mkdir_p(target_path)
-        copy(join(from_path,"contents"), content_path)
+        copy(join(from_path, "contents"), content_path)
 
     if options.workspace or options.find:
         workspace_path = join(target_path, "workspace")
@@ -101,16 +121,19 @@ def path(root_path, options):
         if options.find:
             find_path = join(workspace_path, options.find)
 
-            assert os.path.exists(find_path), "Specified file does not exist in workspace"
+            assert os.path.exists(
+                find_path), "Specified file does not exist in workspace"
             print find_path
         else:
             print workspace_path
     else:
         print content_path
 
+
 def run(base_fn):
     parser = OptionParser()
-    parser.add_option("--repository", dest="repository", default=os.environ.get("MOTH_REPOSITORY"))
+    parser.add_option("--repository", dest="repository",
+                      default=os.environ.get("MOTH_REPOSITORY"))
     parser.add_option("--input-file", dest="input_file")
     parser.add_option("--output-file", dest="output_file")
     parser.add_option("--sha", dest="sha")
