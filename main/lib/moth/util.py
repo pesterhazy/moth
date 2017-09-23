@@ -8,7 +8,7 @@ def find_root(fn):
         if os.path.isfile(os.path.join(fn, "moth.json")):
             return fn
         prev, fn = fn, os.path.abspath(os.path.join(fn, os.pardir))
-    raise Exception("No project root containing moth.json found")
+    return os.path.abspath(".")
 
 
 def read_manifest(root_path):

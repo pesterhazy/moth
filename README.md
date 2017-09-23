@@ -18,15 +18,15 @@ To add moth to a new project, simply download the current `moth` binary to your 
 
 ```shell
 bash -c 'curl -fsSLo moth https://github.com/pesterhazy/moth/releases/download/r${1}/moth && chmod +x moth' -- a62d2a621be13d88741234bf5ac51fabb56f911c
-./moth init
 ```
 
 ## Tutorial
 
-Set the repository. Let's use a local file-based repository:
+Start by configuring the first repository. Let's use a local file-based repository:
 
 ```shell
-export MOTH_REPOSITORY="file:$HOME/.moth-local"
+./moth init --repository "file:$HOME/.moth-local"
+cat moth.json
 ```
 
 Upload a dependency:
@@ -68,28 +68,28 @@ echo due > many/two.txt
 ./moth put --input-file many.zip
 ```
 
-The result is the hash `a0e1119b1dc49f08d79072c13efc81047024047c`. Again moth can print the path to the content:
+The result is the hash `afcd02847a3a3608ba063fb7cba39755ff216075`. Again moth can print the path to the content:
 
 ```shell
-./moth show --sha a0e1119b1dc49f08d79072c13efc81047024047c
+./moth show --sha afcd02847a3a3608ba063fb7cba39755ff216075
 ```
 
 But you can also find and access paths to files within the workspace:
 
 ```shell
-./moth show --sha a0e1119b1dc49f08d79072c13efc81047024047c --find one.txt
+./moth show --sha afcd02847a3a3608ba063fb7cba39755ff216075 --find one.txt
 ```
 
 Which prints:
 
 ```
-/home/user/.moth/db/db/a0e/a0e1119b1dc49f08d79072c13efc81047024047c/workspace/one.txt
+/home/user/.moth/db/db/a0e/afcd02847a3a3608ba063fb7cba39755ff216075/workspace/one.txt
 ```
 
 Or
 
 ```shell
-./moth show --sha a0e1119b1dc49f08d79072c13efc81047024047c --find one.txt --cat
+./moth show --sha afcd02847a3a3608ba063fb7cba39755ff216075 --find one.txt --cat
 ```
 
 which prints:

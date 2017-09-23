@@ -7,9 +7,11 @@ our_temp_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'our_temp_dir')
 function cleanup_temp_dir() { rm -rf "$our_temp_dir" ; } && trap "cleanup_temp_dir" EXIT
 # end our_temp_dir
 
-codedown shell < README.md > "$our_temp_dir/transcript"
+codedown shell < README.md | grep -v  github.com/pesterhazy/moth/releases > "$our_temp_dir/transcript"
+cp bin/mothg "$our_temp_dir/moth"
 
 set -x
 
 cd "$our_temp_dir"
-source "transcript"
+
+source transcript
