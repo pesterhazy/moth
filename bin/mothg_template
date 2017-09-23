@@ -28,8 +28,11 @@ def find_root(fn):
 
 
 def bootstrap(sha, target_file):
-    base_url = "http://localhost:8080"
-    url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
+    if os.environ.get("MOTH_BOOTSTRAP_REPO") is not None:
+        base_url = os.environ.get("MOTH_BOOTSTRAP_REPO")
+        url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
+    else:
+        url = "https://github.com/pesterhazy/moth/releases/download/r" + MAIN_SHA + "/moth_release.zip"
 
     sys.stderr.write("*** " + target_file +
                      " not found.\n*** Attempting to bootstrap\n***\n")

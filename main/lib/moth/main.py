@@ -9,8 +9,7 @@ from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
 import moth.version
-import util
-import fs
+import util, fs
 
 def croak():
     print '\xe2\x9b\x94\xef\xb8\x8f'
