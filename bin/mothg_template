@@ -13,12 +13,12 @@ def mkdir_p(path):
         else:
             raise
 
-def find_root(test):
-  prev, test = None, os.path.abspath(test)
-  while prev != test:
-    if os.path.isfile(os.path.join(test, "moth.yaml")):
-      return test
-    prev, test = test, os.path.abspath(os.path.join(test, os.pardir))
+def find_root(fn):
+  prev, fn = None, os.path.abspath(fn)
+  while prev != fn:
+    if os.path.isfile(os.path.join(fn, "moth.yaml")):
+      return fn
+    prev, fn = fn, os.path.abspath(os.path.join(fn, os.pardir))
   raise Exception("No project root containing moth.yaml found")
 
 def bootstrap(sha, target_file):
@@ -65,4 +65,4 @@ except ImportError:
 
   import moth.main
 
-moth.main.run()
+moth.main.run(os.path.dirname(__file__))

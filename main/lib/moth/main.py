@@ -3,6 +3,7 @@ from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
 import moth.version
+import util
 
 def mkdir_p(path):
     try:
@@ -101,7 +102,24 @@ def get(options):
    target_path = join(repo_base,"db",options.sha[0:3],options.sha)
    shutil.copy(join(target_path,"contents"), options.output_file or "/dev/stdout")
 
-def run():
+def to_db_path(root_path):
+   return join(root_path, ".moth", "db")
+
+def copy(from_fn, to_fn):
+   shutil.copy(from_fn, to_fn)
+
+def path(root_path, options):
+   target_path = join(to_db_path(root_path),"db",options.sha[0:3],options.sha)
+
+   if not os.path.isfile(target_path):
+      repo_base = to_repo_base(options.repository)
+      from_path = join(repo_base,"db",options.sha[0:3],options.sha)
+      mkdir_p(dirname(target_path))
+      copy(join(from_path,"contents"), target_path)
+
+   print target_path
+
+def run(base_fn):
    parser = OptionParser()
    parser.add_option("--repository", dest="repository", default=os.environ.get("MOTH_REPOSITORY"))
    parser.add_option("--input-file", dest="input_file")
@@ -111,12 +129,15 @@ def run():
 
    assert len(args) == 1, "Expecting exactly one positional argument"
 
+   root_path = util.find_root(base_fn)
    action = args[0]
 
    if action == "put":
        put(options)
    elif action == "get":
        get(options)
+   elif action == "path":
+       path(root_path, options)
    elif action == "version":
        print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
    else:
