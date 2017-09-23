@@ -17,6 +17,12 @@ def croak():
     sys.exit(1)
 
 
+def fail(msg):
+    sys.stderr.write(msg)
+    sys.stderr.write("\n")
+    sys.exit(1)
+
+
 def find_vcs_root(test, dirs=(".git",)):
     prev, test = None, os.path.abspath(test)
     while prev != test:
@@ -97,6 +103,7 @@ def resolve_alias(root_path, alias):
     assert sha, "Unable to resolve alias"
     return sha
 
+
 def path(root_path, options):
     sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
     assert sha, "You need to specify a sha"
@@ -143,6 +150,18 @@ def path(root_path, options):
         print content_path
 
 
+def help_message():
+    print '''
+usage: moth <command> [args]
+
+The following commands are available:
+
+  path      Read object
+  put       Put object
+  version   Print current moth version
+'''[1:-1]
+
+
 def run(base_fn):
     parser = OptionParser()
     parser.add_option("--repository", dest="repository",
@@ -155,10 +174,14 @@ def run(base_fn):
     parser.add_option("--workspace", dest="workspace", action="store_true")
     (options, args) = parser.parse_args()
 
-    assert len(args) == 1, "Expecting exactly one positional argument"
+    if len(args) == 0:
+        action = "default"
+    elif len(args) > 1:
+        fail("Too many arguments")
+    else:
+        action = args[0]
 
     root_path = util.find_root(base_fn)
-    action = args[0]
 
     if action == "put":
         put(options)
@@ -168,6 +191,8 @@ def run(base_fn):
         path(root_path, options)
     elif action == "version":
         print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
+    elif action in ["default", "help"]:
+        help_message()
     else:
-        print "Unknown action"
+        fail("Unknown action: " + action)
         sys.exit(1)
