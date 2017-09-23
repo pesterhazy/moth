@@ -17,17 +17,16 @@ Simple installation is one of moth's goals. No global installation is necessary.
 To add moth to a new project, simply download the current `moth` binary to your project directory:
 
 ```shell
-touch moth.yaml
 bash -c 'curl -fsSLo moth https://github.com/pesterhazy/moth/releases/download/r${1}/moth && chmod +x moth' -- a62d2a621be13d88741234bf5ac51fabb56f911c
-./moth version
 ```
 
 ## Tutorial
 
-Set the repository. Let's use a local file-based repository:
+Start by configuring a repository. The `moth init` command expects a repository URL and creates a fresh `moth.yaml` in the current directory:
 
 ```shell
-export MOTH_REPOSITORY="file:$HOME/.moth-local"
+./moth init --repository "file:$HOME/.moth-local"
+cat moth.json
 ```
 
 Upload a dependency:
@@ -37,11 +36,9 @@ echo "Bom dia" > hello.txt
 ./moth put --input-file hello.txt
 ```
 
+This writes a file to the `~/.moth-local` folder. Local filesystem-based repositories are not as useful as remote repositories, but they are easier to so we'll use one in this tutorial. The process for uploading to a cloud storage service is similar.
 
-
-This writes a file to the `~/.moth-local` folder, but the process for uploading to a cloud storage service is similar.
-
-Note that this command writes back the SHA hash of the content you uploaded:
+Note that `moth put` prints the SHA hash of the content you just uploaded to the terminal:
 
 ```
 504b7c6424e6fa94402786315bb58bc1e504bb8f
@@ -65,32 +62,32 @@ Often, the dependencies you work with contain multiple files. Moth supports this
 mkdir many
 echo uno > many/one.txt
 echo due > many/two.txt
-( cd many && zip ../many.zip -r * )
+( cd many && zip -X ../many.zip -r * )
 ./moth put --input-file many.zip
 ```
 
-The result is the hash `a0e1119b1dc49f08d79072c13efc81047024047c`. Again moth can print the path to the content:
+The result is the hash `47c06bda08b0ab6c1f1290788024bfecf0d02d06`. Again `moth show` can print the path to the downloaded content:
 
 ```shell
-./moth show --sha a0e1119b1dc49f08d79072c13efc81047024047c
+./moth show --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06
 ```
 
 But you can also find and access paths to files within the workspace:
 
 ```shell
-./moth show --sha a0e1119b1dc49f08d79072c13efc81047024047c --find one.txt
+./moth show --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06 --find one.txt
 ```
 
 Which prints:
 
 ```
-/home/user/.moth/db/db/a0e/a0e1119b1dc49f08d79072c13efc81047024047c/workspace/one.txt
+/home/user/.moth/db/db/afe/47c06bda08b0ab6c1f1290788024bfecf0d02d06/workspace/one.txt
 ```
 
 Or
 
 ```shell
-./moth show --sha a0e1119b1dc49f08d79072c13efc81047024047c --find one.txt --cat
+./moth show --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06 --find one.txt --cat
 ```
 
 which prints:
@@ -101,17 +98,13 @@ uno
 
 When used with the `--find` flag, moth automatically extract zip files in a local folder. This makes it easy to refer to workspace contents from other scripts.
 
-SHA1 hashes are long enough to ensure that hash collisions are unlikely. But they're also difficult to remember, so moth allows you to refer to objects through aliases. First define the alias in `moth.yaml`:
+SHA1 hashes are long enough to ensure that hash collisions are unlikely. But they're also difficult to remember, so moth allows you to refer to objects by using aliases. First define the alias:
 
 ```shell
-cat > moth.yaml <<EOF
-aliases:
-  many:
-    sha: a0e1119b1dc49f08d79072c13efc81047024047c
-EOF
+./moth alias --alias many --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06
 ```
 
-Now you can refer to the object using an alias:
+This updates `moth.json`. Now you can refer to the object using an alias:
 
 ```shell
 ./moth show --alias many
@@ -132,11 +125,19 @@ If the aliased object is a zip file, can also refer to files inside the workspac
 ```
 usage: moth <command> [args]
 
-The following commands are available:
+Getting started
+
+  init      Initialize moth project in current directory
+  version   Print current moth version
+
+Managing data
+
+  put       Put object
+  alias     Add or update alias
+
+Retrieving data
 
   show      Read object
-  put       Put object
-  version   Print current moth version
 ```
 
 ## Author

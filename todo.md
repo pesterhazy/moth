@@ -1,14 +1,18 @@
+# before merge
+
+- update EOF section in README
+
 # todo
 
 - clean up main.py
 - add backend for http(s)
-- set MAIN_SHA in moth.yaml
+- set MAIN_SHA in moth.json
 
 # old
 
 - add `moth check <dep>` commmand
 - make `moth run` check dependency
-- add manifest (moth.yaml?) to each dependency's directory
+- add manifest (moth.json?) to each dependency's directory
 - multi-flle vs single-file dependencies
 
 # Design
@@ -25,7 +29,7 @@
         - defaults to using PROJECT_ROOT/.moth
     - moth-core
         - contains main CLI
-        - version of moth-core is defined explicitly in `moth.yaml`
+        - version of moth-core is defined explicitly in `moth.json`
         - main operations:
             - `moth get <coordinates>`
     - moth-url

@@ -5,6 +5,7 @@ import re
 import shutil
 import zipfile
 import tempfile
+import json
 from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
@@ -31,16 +32,6 @@ def find_vcs_root(test, dirs=(".git",)):
     raise Exception("No project root found")
 
 
-def fetch(artifact_id, version, target):
-    print "Fetching:", artifact_id, version
-    path = dirname(target)
-    if path:
-        fs.mkdir_p(path)
-        repo_dir = os.path.expanduser("~/.moth-repo")
-        check_call(
-            ["cp", join(repo_dir, artifact_id, version, artifact_id), target])
-
-
 def split_argv(argv):
     if '--' in argv:
         idx = argv.index('--')
@@ -61,10 +52,11 @@ def hash_file(fn):
 
 
 def put(options):
-    assert options.repository
+    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+    assert repository
     assert options.input_file
 
-    repo_base = to_repo_base(options.repository)
+    repo_base = to_repo_base(repository)
 
     sha = hash_file(options.input_file)
     target_path = join(repo_base, "db", sha[0:3], sha)
@@ -75,10 +67,11 @@ def put(options):
 
 
 def get(options):
-    assert options.repository
+    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+    assert repository
     assert options.sha, "Need to pass a sha"
 
-    repo_base = to_repo_base(options.repository)
+    repo_base = to_repo_base(repository)
     target_path = join(repo_base, "db", options.sha[0:3], options.sha)
     shutil.copy(join(target_path, "contents"),
                 options.output_file or "/dev/stdout")
@@ -110,19 +103,27 @@ def cat_or_print(fn, cat):
         print fn
 
 
-def show(root_path, options):
-    sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
-    assert sha, "You need to specify a sha"
-
-    target_path = join(to_db_path(root_path), "db",
-                       sha[0:3], sha)
+def ensure(sha, repository, target_path):
+    assert repository
     content_path = join(target_path, "contents")
 
     if not os.path.isfile(target_path):
-        repo_base = to_repo_base(options.repository)
+        repo_base = to_repo_base(repository)
         from_path = join(repo_base, "db", sha[0:3], sha)
         fs.mkdir_p(target_path)
         copy(join(from_path, "contents"), content_path)
+
+
+def show(root_path, options):
+    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+
+    sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
+    assert sha, "You need to specify a sha"
+
+    target_path = join(to_db_path(root_path), sha[0:3], sha)
+    content_path = join(target_path, "contents")
+
+    ensure(sha, repository, target_path)
 
     if options.workspace or options.find:
         workspace_path = join(target_path, "workspace")
@@ -155,23 +156,79 @@ def show(root_path, options):
     else:
         cat_or_print(content_path, options.cat)
 
+def init(options):
+    assert not os.path.exists("moth.json"), "File already exists: moth.json"
+
+    assert options.repository
+
+    data = {"repositories": [{"url": options.repository}]}
+
+    with open("moth.json","w") as out:
+        json.dump(data, out, indent=4, separators=(',', ': '))
+
+    print "Initialized moth project in current directory"
+    print
+    print "Initial repository:", options.repository
+
+def is_valid_sha(s):
+    return bool(re.match("^[0-9a-f]{40}$", s))
+
+def action_alias(root_path, options):
+    sha = options.sha
+    assert options.alias
+    assert sha
+    assert is_valid_sha(sha)
+
+    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+
+    target_path = join(to_db_path(root_path), sha[0:3], sha)
+    ensure(sha, repository,target_path)
+
+    manifest = util.read_manifest(root_path)
+    if not manifest.get("aliases"):
+        manifest["aliases"] = {}
+    exists = bool(manifest["aliases"].get(options.alias))
+    if not manifest["aliases"].get(options.alias):
+        manifest["aliases"][options.alias] = {}
+
+    if manifest["aliases"].get(options.alias,{}).get("sha") == sha:
+        print "Alias already up to date"
+        return
+
+    if exists:
+        print "Updating alias:", options.alias
+    else:
+        print "Creating alias:", options.alias
+
+    manifest["aliases"][options.alias]["sha"] = sha
+
+    util.write_manifest(manifest, root_path)
 
 def help_message():
+    # Remember to update README.md as well!
+
     print '''
 usage: moth <command> [args]
 
-The following commands are available:
+Getting started
+
+  init      Initialize moth project in current directory
+  version   Print current moth version
+
+Managing data
+
+  put       Put object
+  alias     Add or update alias
+
+Retrieving data
 
   show      Read object
-  put       Put object
-  version   Print current moth version
 '''[1:-1]
 
 
 def run(base_fn):
     parser = OptionParser()
-    parser.add_option("--repository", dest="repository",
-                      default=os.environ.get("MOTH_REPOSITORY"))
+    parser.add_option("--repository", dest="repository")
     parser.add_option("--input-file", dest="input_file")
     parser.add_option("--output-file", dest="output_file")
     parser.add_option("--sha", dest="sha")
@@ -188,14 +245,16 @@ def run(base_fn):
     else:
         action = args[0]
 
-    root_path = util.find_root(base_fn)
-
     if action == "put":
         put(options)
     elif action == "get":
         get(options)
     elif action == "show":
-        show(root_path, options)
+        show(util.find_root(base_fn), options)
+    elif action == "init":
+        init(options)
+    elif action == "alias":
+        action_alias(util.find_root(base_fn), options)
     elif action == "version":
         print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
     elif action in ["default", "help"]:
