@@ -166,11 +166,14 @@ def init(options):
 
     assert options.repository
 
-    print json.dumps({"repositories": [{"url": options.repository}]},
-                     indent=4, separators=(',', ': '))
+    data = {"repositories": [{"url": options.repository}]}
 
-    croak()
+    with open("moth.json","w") as out:
+        json.dump(data, out, indent=4, separators=(',', ': '))
 
+    print "Initialized moth project in current directory"
+    print
+    print "Initial repository:", options.repository
 
 def help_message():
     print '''
