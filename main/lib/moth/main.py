@@ -185,7 +185,7 @@ def run(base_fn):
     if len(args) == 0:
         action = "default"
     elif len(args) > 1:
-        fail("Too many arguments")
+        fail("Too many positional arguments")
     else:
         action = args[0]
 

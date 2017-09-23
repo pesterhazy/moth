@@ -4,10 +4,18 @@ set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
 rm -rf .moth
 
 makezip
-moth put --input-file srv/main.zip --repository file:$PWD/repo
 makezip2
+
+echo
+
+echo -n "main.zip: "
+moth put --input-file srv/main.zip --repository file:$PWD/repo
+echo -n "foo: "
+moth put --input-file example/foo --repository file:$PWD/repo
+echo -n "bar: "
 moth put --input-file srv/bar.zip --repository file:$PWD/repo
 
+echo
 
 # pidkill 8080
 # http-server repo &
