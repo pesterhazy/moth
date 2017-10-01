@@ -1,3 +1,2 @@
-- remove MOTH_REPOSITORY env var?
 - rename MOTH_BOOTSTRAP_REPO
 - remove bogus S3 credentials
