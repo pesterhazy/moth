@@ -52,10 +52,15 @@ def find_repository(root_path):
     return repos[0].get("url") if len(repos) == 1 else None
 
 
-def action_put(root_path, options):
+def pick_repository(root_path, options):
     repository = options.repository or find_repository(root_path)
     if not repository:
         raise UsageException("No repository given")
+    return repository
+
+
+def action_put(root_path, options):
+    repository = pick_repository(root_path, options)
     assert options.input_file
 
     provider = make_provider(repository)
@@ -113,7 +118,7 @@ def ensure(sha, repository, target_path):
 
 
 def action_show(root_path, options):
-    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+    repository = pick_repository(root_path, options)
 
     sha = resolve_alias(
         root_path, options.alias) if options.alias else options.sha
