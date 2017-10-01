@@ -187,7 +187,7 @@ def action_alias(root_path, options):
     assert sha
     assert is_valid_sha(sha)
 
-    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+    repository = pick_repository(root_path, options)
 
     target_path = join(to_db_path(root_path), sha[0:3], sha)
     ensure(sha, repository, target_path)
