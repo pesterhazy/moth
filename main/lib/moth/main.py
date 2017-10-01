@@ -12,7 +12,7 @@ import util
 from util import UsageException
 import fs
 
-import s3
+import s3_provider
 import file_provider
 
 
@@ -42,7 +42,7 @@ def make_provider(url):
     if url.startswith("file:"):
         return file_provider.FileProvider(url)
     elif url.startswith("s3:"):
-        return s3.S3Provider(url)
+        return s3_provider.S3Provider(url)
 
     raise Exception("No match for URL type: " + url)
 
