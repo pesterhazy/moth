@@ -193,6 +193,10 @@ def action_alias(root_path, options):
     util.write_manifest(manifest, root_path)
 
 
+def action_version():
+    print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
+
+
 def help_message():
     # Remember to update README.md as well!
 
@@ -246,7 +250,7 @@ def run(base_fn):
         elif action == "alias":
             action_alias(util.find_root(base_fn), options)
         elif action == "version":
-            print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
+            action_version()
         elif action in ["default", "help"]:
             help_message()
         else:
