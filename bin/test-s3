@@ -11,6 +11,8 @@ node_modules/.bin/codedown shell < docs/s3.md > "$our_temp_dir/transcript"
 
 set -x
 
+export PATH="$PWD/bin:$PATH"
+
 cd "$our_temp_dir"
 
 export AWS_ACCESS_KEY_ID="1234"

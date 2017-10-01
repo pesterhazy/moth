@@ -6,6 +6,7 @@
   "author": "Paulus Esterhazy",
   "license": "MIT",
   "dependencies": {
-    "codedown": "^2.1.2"
+    "codedown": "^2.1.2",
+    "s3rver": "^1.0.3"
   }
 }

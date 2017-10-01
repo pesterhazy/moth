@@ -16,6 +16,8 @@ fi
 
 set -x
 
+export PATH="$PWD/bin:$PATH"
+
 cd "$our_temp_dir"
 
 source transcript
