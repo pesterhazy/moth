@@ -36,7 +36,7 @@ def make_provider(url):
     raise Exception("No match for URL type: " + url)
 
 
-def put(options):
+def action_put(options):
     repository = options.repository or os.environ.get("MOTH_REPOSITORY")
     if not repository:
         raise UsageException("No repository given")
@@ -48,7 +48,7 @@ def put(options):
     print sha
 
 
-def get(options):
+def action_get(options):
     repository = options.repository or os.environ.get("MOTH_REPOSITORY")
     if not repository:
         raise UsageException("No repository given")
@@ -96,7 +96,7 @@ def ensure(sha, repository, target_path):
         provider.get(sha, content_path)
 
 
-def show(root_path, options):
+def action_show(root_path, options):
     repository = options.repository or os.environ.get("MOTH_REPOSITORY")
 
     sha = resolve_alias(
@@ -140,7 +140,7 @@ def show(root_path, options):
         cat_or_print(content_path, options.cat)
 
 
-def init(options):
+def action_init(options):
     assert not os.path.exists("moth.json"), "File already exists: moth.json"
 
     if not options.repository:
@@ -236,13 +236,13 @@ def run(base_fn):
             action = args[0]
 
         if action == "put":
-            put(options)
+            action_put(options)
         elif action == "get":
-            get(options)
+            action_get(options)
         elif action == "show":
-            show(util.find_root(base_fn), options)
+            action_show(util.find_root(base_fn), options)
         elif action == "init":
-            init(options)
+            action_init(options)
         elif action == "alias":
             action_alias(util.find_root(base_fn), options)
         elif action == "version":
