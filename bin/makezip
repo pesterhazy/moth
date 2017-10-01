@@ -21,7 +21,7 @@ popd
 
 stripzip "$target"
 
-sha=$(shasum "$target" | cut -f 1 -d " ")
+sha=$(perl -MDigest::SHA=sha1_hex -E 'say sha1_hex<>' "$target")
 
 echo "$sha"
 

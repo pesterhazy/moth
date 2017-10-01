@@ -5,16 +5,16 @@ set -x
 
 rm -rf target
 
-makezip2
-makezip
+bin/makezip2
+bin/makezip
 
 set +x
 
 echo
 
 echo -n "main.zip: "
-moth put --input-file target/moth_release.zip --repository file:$PWD/repo
+bin/moth put --input-file target/moth_release.zip --repository file:$PWD/repo
 echo -n "foo: "
-moth put --input-file example/foo --repository file:$PWD/repo
+bin/moth put --input-file example/foo --repository file:$PWD/repo
 echo -n "bar: "
-moth put --input-file target/bar.zip --repository file:$PWD/repo
+bin/moth put --input-file target/bar.zip --repository file:$PWD/repo

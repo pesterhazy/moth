@@ -1,0 +1,11 @@
+{
+  "name": "moth",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:pesterhazy/moth.git",
+  "author": "Paulus Esterhazy",
+  "license": "MIT",
+  "dependencies": {
+    "codedown": "^2.1.2"
+  }
+}

@@ -8,10 +8,10 @@ function cleanup_temp_dir() { rm -rf "$our_temp_dir" ; } && trap "cleanup_temp_d
 # end our_temp_dir
 
 if [[ "${1-}" == "--local" ]]; then
-    codedown shell < README.md | grep -v  github.com/pesterhazy/moth/releases > "$our_temp_dir/transcript"
+    node_modules/.bin/codedown shell < README.md | grep -v  github.com/pesterhazy/moth/releases > "$our_temp_dir/transcript"
     cp bin/mothg "$our_temp_dir/moth"
 else
-    codedown shell < README.md > "$our_temp_dir/transcript"
+    node_modules/.bin/codedown shell < README.md > "$our_temp_dir/transcript"
 fi
 
 set -x

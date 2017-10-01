@@ -9,3 +9,4 @@ release.txt
 quark
 mock-s3
 foo
+node_modules/
