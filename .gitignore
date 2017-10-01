@@ -7,3 +7,5 @@ third_party
 bin/mothg
 release.txt
 quark
+mock-s3
+foo

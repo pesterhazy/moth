@@ -175,6 +175,7 @@ def action_init(options):
 
     with open("moth.json", "w") as out:
         json.dump(data, out, indent=4, separators=(',', ': '))
+        out.write("\n")
 
     print "Initialized moth project in current directory"
     print
