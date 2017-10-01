@@ -27,6 +27,11 @@ def fail(msg):
     sys.exit(1)
 
 
+def warn(msg):
+    sys.stderr.write(msg)
+    sys.stderr.write("\n")
+
+
 def make_provider(url):
     if url.startswith("file:"):
         return file_provider.FileProvider(url)
@@ -36,8 +41,19 @@ def make_provider(url):
     raise Exception("No match for URL type: " + url)
 
 
-def action_put(options):
-    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+def find_repository(root_path):
+    manifest = util.read_manifest(root_path)
+
+    repos = manifest.get("repositories", [])
+
+    if len(repos) > 1:
+        warn("More than one repository configured. Picking the first entry")
+
+    return repos[0].get("url") if len(repos) == 1 else None
+
+
+def action_put(root_path, options):
+    repository = options.repository or find_repository(root_path)
     if not repository:
         raise UsageException("No repository given")
     assert options.input_file
@@ -146,7 +162,6 @@ def action_init(options):
     if not options.repository:
         raise UsageException("No repository given")
 
-
     data = {"repositories": [{"url": options.repository}]}
 
     with open("moth.json", "w") as out:
@@ -240,7 +255,7 @@ def run(base_fn):
             action = args[0]
 
         if action == "put":
-            action_put(options)
+            action_put(util.find_root(base_fn), options)
         elif action == "get":
             action_get(options)
         elif action == "show":

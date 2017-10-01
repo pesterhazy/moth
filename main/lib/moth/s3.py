@@ -2,6 +2,7 @@ import boto3
 import util
 from urlparse import urlparse
 
+
 class S3Provider:
     def __init__(self, url):
         self.url_components = urlparse(url)
