@@ -59,10 +59,16 @@ Note that `moth put` prints the SHA hash of the content you just uploaded to the
 You can use this hash to retrieve the dependency again:
 
 ```shell
+./moth get --sha 504b7c6424e6fa94402786315bb58bc1e504bb8f
+```
+
+or download it to the local cache:
+
+```shell
 ./moth show --sha 504b7c6424e6fa94402786315bb58bc1e504bb8f
 ```
 
-You can show the file:
+You can also show the file contents from the local cache. This will download the file only if it isn't present already:
 
 ```shell
 ./moth show --sha 504b7c6424e6fa94402786315bb58bc1e504bb8f --cat
@@ -74,32 +80,32 @@ Often, the dependencies you work with contain multiple files. Moth supports this
 mkdir many
 echo uno > many/one.txt
 echo due > many/two.txt
-( cd many && zip -X ../many.zip -r * )
+( cd many && zip -X ../many.zip -r * && stripzip ../many.zip )
 ./moth put --input-file many.zip
 ```
 
-The result is the hash `47c06bda08b0ab6c1f1290788024bfecf0d02d06`. Again `moth show` can print the path to the downloaded content:
+The result is the hash `93287c444a1a870de36107c26c569ab28154ca9f`. Again `moth show` can print the path to the downloaded content:
 
 ```shell
-./moth show --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06
+./moth show --sha 93287c444a1a870de36107c26c569ab28154ca9f
 ```
 
 But you can also find and access paths to files within the workspace:
 
 ```shell
-./moth show --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06 --find one.txt
+./moth show --sha 93287c444a1a870de36107c26c569ab28154ca9f --find one.txt
 ```
 
 Which prints:
 
 ```
-/home/user/.moth/db/db/afe/47c06bda08b0ab6c1f1290788024bfecf0d02d06/workspace/one.txt
+/home/user/.moth/db/db/afe/93287c444a1a870de36107c26c569ab28154ca9f/workspace/one.txt
 ```
 
 Or
 
 ```shell
-./moth show --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06 --find one.txt --cat
+./moth show --sha 93287c444a1a870de36107c26c569ab28154ca9f --find one.txt --cat
 ```
 
 which prints:
@@ -113,7 +119,7 @@ When used with the `--find` flag, moth automatically extract zip files in a loca
 SHA1 hashes are long enough to ensure that hash collisions are unlikely. But they're also difficult to remember, so moth allows you to refer to objects by using aliases. First define the alias:
 
 ```shell
-./moth alias --alias many --sha 47c06bda08b0ab6c1f1290788024bfecf0d02d06
+./moth alias --alias many --sha 93287c444a1a870de36107c26c569ab28154ca9f
 ```
 
 This updates `moth.json`. Now you can refer to the object using an alias:

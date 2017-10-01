@@ -1,16 +1,20 @@
 import os
 import sys
-import hashlib
 import re
 import shutil
 import zipfile
 import tempfile
 import json
-from os.path import join, isfile, dirname
-from subprocess import check_call
+from os.path import join
 from optparse import OptionParser
 import moth.version
-import util, fs
+import util
+from util import UsageException
+import fs
+
+import s3
+import file_provider
+
 
 def croak():
     print '\xe2\x9b\x94\xef\xb8\x8f'
@@ -23,58 +27,60 @@ def fail(msg):
     sys.exit(1)
 
 
-def find_vcs_root(test, dirs=(".git",)):
-    prev, test = None, os.path.abspath(test)
-    while prev != test:
-        if any(os.path.isdir(os.path.join(test, d)) for d in dirs):
-            return test
-        prev, test = test, os.path.abspath(os.path.join(test, os.pardir))
-    raise Exception("No project root found")
+def warn(msg):
+    sys.stderr.write(msg)
+    sys.stderr.write("\n")
 
 
-def split_argv(argv):
-    if '--' in argv:
-        idx = argv.index('--')
-
-        return [argv[:idx], argv[idx + 1:]]
-    else:
-        return [argv, []]
+def dbg(*args):
+    if os.environ.get("MOTH_DEBUG") == "1":
+        sys.stderr.write(" ".join(args))
+        sys.stderr.write("\n")
 
 
-def to_repo_base(url):
-    match = re.match("^file:/*(/.*$)", url)
-    assert match, "Must be file URL"
-    return match.group(1)
+def make_provider(url):
+    if url.startswith("file:"):
+        return file_provider.FileProvider(url)
+    elif url.startswith("s3:"):
+        return s3.S3Provider(url)
+
+    raise Exception("No match for URL type: " + url)
 
 
-def hash_file(fn):
-    return hashlib.sha1(file(fn).read()).hexdigest()
+def find_repository(root_path):
+    manifest = util.read_manifest(root_path)
+
+    repos = manifest.get("repositories", [])
+
+    if len(repos) > 1:
+        warn("More than one repository configured. Picking the first entry")
+
+    return repos[0].get("url") if len(repos) == 1 else None
 
 
-def put(options):
-    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
-    assert repository
+def pick_repository(root_path, options):
+    repository = options.repository or find_repository(root_path)
+    if not repository:
+        raise UsageException("No repository given")
+    return repository
+
+
+def action_put(root_path, options):
+    repository = pick_repository(root_path, options)
     assert options.input_file
 
-    repo_base = to_repo_base(repository)
+    provider = make_provider(repository)
 
-    sha = hash_file(options.input_file)
-    target_path = join(repo_base, "db", sha[0:3], sha)
-    fs.mkdir_p(target_path)
-    shutil.copy(options.input_file, join(target_path, "contents"))
-
+    sha = provider.put(options.input_file)
     print sha
 
 
-def get(options):
-    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
-    assert repository
+def action_get(root_path, options):
+    repository = pick_repository(root_path, options)
     assert options.sha, "Need to pass a sha"
 
-    repo_base = to_repo_base(repository)
-    target_path = join(repo_base, "db", options.sha[0:3], options.sha)
-    shutil.copy(join(target_path, "contents"),
-                options.output_file or "/dev/stdout")
+    provider = make_provider(repository)
+    provider.get(options.sha, options.output_file or "/dev/stdout")
 
 
 def to_db_path(root_path):
@@ -104,20 +110,22 @@ def cat_or_print(fn, cat):
 
 
 def ensure(sha, repository, target_path):
-    assert repository
+    if not repository:
+        raise UsageException("No repository given")
+
     content_path = join(target_path, "contents")
 
     if not os.path.isfile(target_path):
-        repo_base = to_repo_base(repository)
-        from_path = join(repo_base, "db", sha[0:3], sha)
+        provider = make_provider(repository)
         fs.mkdir_p(target_path)
-        copy(join(from_path, "contents"), content_path)
+        provider.get(sha, content_path)
 
 
-def show(root_path, options):
-    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+def action_show(root_path, options):
+    repository = pick_repository(root_path, options)
 
-    sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
+    sha = resolve_alias(
+        root_path, options.alias) if options.alias else options.sha
     assert sha, "You need to specify a sha"
 
     target_path = join(to_db_path(root_path), sha[0:3], sha)
@@ -156,22 +164,27 @@ def show(root_path, options):
     else:
         cat_or_print(content_path, options.cat)
 
-def init(options):
+
+def action_init(options):
     assert not os.path.exists("moth.json"), "File already exists: moth.json"
 
-    assert options.repository
+    if not options.repository:
+        raise UsageException("No repository given")
 
     data = {"repositories": [{"url": options.repository}]}
 
-    with open("moth.json","w") as out:
+    with open("moth.json", "w") as out:
         json.dump(data, out, indent=4, separators=(',', ': '))
+        out.write("\n")
 
     print "Initialized moth project in current directory"
     print
     print "Initial repository:", options.repository
 
+
 def is_valid_sha(s):
     return bool(re.match("^[0-9a-f]{40}$", s))
+
 
 def action_alias(root_path, options):
     sha = options.sha
@@ -179,10 +192,10 @@ def action_alias(root_path, options):
     assert sha
     assert is_valid_sha(sha)
 
-    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
+    repository = pick_repository(root_path, options)
 
     target_path = join(to_db_path(root_path), sha[0:3], sha)
-    ensure(sha, repository,target_path)
+    ensure(sha, repository, target_path)
 
     manifest = util.read_manifest(root_path)
     if not manifest.get("aliases"):
@@ -191,7 +204,7 @@ def action_alias(root_path, options):
     if not manifest["aliases"].get(options.alias):
         manifest["aliases"][options.alias] = {}
 
-    if manifest["aliases"].get(options.alias,{}).get("sha") == sha:
+    if manifest["aliases"].get(options.alias, {}).get("sha") == sha:
         print "Alias already up to date"
         return
 
@@ -203,6 +216,11 @@ def action_alias(root_path, options):
     manifest["aliases"][options.alias]["sha"] = sha
 
     util.write_manifest(manifest, root_path)
+
+
+def action_version():
+    print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
+
 
 def help_message():
     # Remember to update README.md as well!
@@ -227,38 +245,47 @@ Retrieving data
 
 
 def run(base_fn):
-    parser = OptionParser()
-    parser.add_option("--repository", dest="repository")
-    parser.add_option("--input-file", dest="input_file")
-    parser.add_option("--output-file", dest="output_file")
-    parser.add_option("--sha", dest="sha")
-    parser.add_option("--alias", dest="alias")
-    parser.add_option("--find", dest="find")
-    parser.add_option("--workspace", dest="workspace", action="store_true")
-    parser.add_option("--cat", dest="cat", action="store_true")
-    (options, args) = parser.parse_args()
+    def find_root():
+        root_path = util.find_root(base_fn)
+        dbg("root_path:", root_path)
+        return root_path
 
-    if len(args) == 0:
-        action = "default"
-    elif len(args) > 1:
-        fail("Too many positional arguments")
-    else:
-        action = args[0]
+    try:
+        parser = OptionParser()
+        parser.add_option("--repository", dest="repository")
+        parser.add_option("--input-file", dest="input_file")
+        parser.add_option("--output-file", dest="output_file")
+        parser.add_option("--sha", dest="sha")
+        parser.add_option("--alias", dest="alias")
+        parser.add_option("--find", dest="find")
+        parser.add_option("--workspace", dest="workspace", action="store_true")
+        parser.add_option("--cat", dest="cat", action="store_true")
+        (options, args) = parser.parse_args()
 
-    if action == "put":
-        put(options)
-    elif action == "get":
-        get(options)
-    elif action == "show":
-        show(util.find_root(base_fn), options)
-    elif action == "init":
-        init(options)
-    elif action == "alias":
-        action_alias(util.find_root(base_fn), options)
-    elif action == "version":
-        print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
-    elif action in ["default", "help"]:
-        help_message()
-    else:
-        fail("Unknown action: " + action)
+        if len(args) == 0:
+            action = "default"
+        elif len(args) > 1:
+            fail("Too many positional arguments")
+        else:
+            action = args[0]
+
+        if action == "put":
+            action_put(find_root(), options)
+        elif action == "get":
+            action_get(find_root(), options)
+        elif action == "show":
+            action_show(find_root(), options)
+        elif action == "init":
+            action_init(options)
+        elif action == "alias":
+            action_alias(find_root(), options)
+        elif action == "version":
+            action_version()
+        elif action in ["default", "help"]:
+            help_message()
+        else:
+            fail("Unknown action: " + action)
+            sys.exit(1)
+    except UsageException as e:
+        sys.stderr.write("Error: " + e.message + "\n")
         sys.exit(1)

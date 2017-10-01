@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+rm -rf mock-s3
+mkdir -p mock-s3
+s3rver -d mock-s3

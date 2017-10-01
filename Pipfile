@@ -5,5 +5,9 @@ name = "pypi"
 
 [dev-packages]
 "autopep8" = "*"
+ipython = "*"
+
+
 
 [packages]
+"boto3" = "*"

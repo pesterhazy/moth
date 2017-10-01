@@ -32,7 +32,8 @@ def bootstrap(sha, target_file):
         base_url = os.environ.get("MOTH_BOOTSTRAP_REPO")
         url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
     else:
-        url = "https://github.com/pesterhazy/moth/releases/download/r" + MAIN_SHA + "/moth_release.zip"
+        url = "https://github.com/pesterhazy/moth/releases/download/r" + \
+            MAIN_SHA + "/moth_release.zip"
 
     sys.stderr.write("*** " + target_file +
                      " not found.\n*** Attempting to bootstrap\n***\n")
