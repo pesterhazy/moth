@@ -11,4 +11,4 @@ if os.path.exists(LIB_PATH):
 
 import moth.main
 
-moth.main.run(os.path.dirname(__file__))
+moth.main.run(os.path.curdir)

@@ -32,6 +32,12 @@ def warn(msg):
     sys.stderr.write("\n")
 
 
+def dbg(*args):
+    if os.environ.get("MOTH_DEBUG") == "1":
+        sys.stderr.write(" ".join(args))
+        sys.stderr.write("\n")
+
+
 def make_provider(url):
     if url.startswith("file:"):
         return file_provider.FileProvider(url)
@@ -238,6 +244,11 @@ Retrieving data
 
 
 def run(base_fn):
+    def find_root():
+        root_path = util.find_root(base_fn)
+        dbg("root_path:", root_path)
+        return root_path
+
     try:
         parser = OptionParser()
         parser.add_option("--repository", dest="repository")
@@ -258,15 +269,15 @@ def run(base_fn):
             action = args[0]
 
         if action == "put":
-            action_put(util.find_root(base_fn), options)
+            action_put(find_root(), options)
         elif action == "get":
-            action_get(util.find_root(base_fn), options)
+            action_get(find_root(), options)
         elif action == "show":
-            action_show(util.find_root(base_fn), options)
+            action_show(find_root(), options)
         elif action == "init":
             action_init(options)
         elif action == "alias":
-            action_alias(util.find_root(base_fn), options)
+            action_alias(find_root(), options)
         elif action == "version":
             action_version()
         elif action in ["default", "help"]:
