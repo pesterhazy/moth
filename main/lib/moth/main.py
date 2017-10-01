@@ -10,7 +10,10 @@ from os.path import join, isfile, dirname
 from subprocess import check_call
 from optparse import OptionParser
 import moth.version
-import util, fs
+import util
+import fs
+from urlparse import urlparse
+import boto3
 
 def croak():
     print '\xe2\x9b\x94\xef\xb8\x8f'
@@ -41,6 +44,7 @@ def split_argv(argv):
         return [argv, []]
 
 
+# TODO: remove
 def to_repo_base(url):
     match = re.match("^file:/*(/.*$)", url)
     assert match, "Must be file URL"
@@ -51,18 +55,60 @@ def hash_file(fn):
     return hashlib.sha1(file(fn).read()).hexdigest()
 
 
+class FileProvider:
+    def __init__(self, url):
+        self.repo_base = self.to_repo_base(url)
+        pass
+
+    def to_repo_base(self, url):
+        match = re.match("^file:/*(/.*$)", url)
+        assert match, "Must be file URL"
+        return match.group(1)
+
+    def put(self, input_file):
+        sha = hash_file(input_file)
+        target_path = join(self.repo_base, "db", sha[0:3], sha)
+        fs.mkdir_p(target_path)
+        shutil.copy(input_file, join(target_path, "contents"))
+
+        return sha
+
+
+def pjoin(*args):
+    return "/".join(args)
+
+
+class S3Provider:
+    def __init__(self, url):
+        self.url_components = urlparse(url)
+
+    def put(self, input_file):
+        sha = hash_file(input_file)
+        target_path = pjoin(self.url_components.path or "/",
+                                "db", sha[0:3], sha)
+        s3 = boto3.resource('s3', endpoint_url="http://localhost:4568", aws_access_key_id="1234", aws_secret_access_key="1234")
+        s3.Bucket(self.url_components.netloc).upload_file(input_file, target_path)
+
+        return sha
+
+
+def make_provider(url):
+    if url.startswith("file:"):
+        return FileProvider(url)
+    elif url.startswith("s3:"):
+        return S3Provider(url)
+
+    raise Exception("No match for URL type: " + url)
+
+
 def put(options):
     repository = options.repository or os.environ.get("MOTH_REPOSITORY")
     assert repository
     assert options.input_file
 
-    repo_base = to_repo_base(repository)
+    provider = make_provider(repository)
 
-    sha = hash_file(options.input_file)
-    target_path = join(repo_base, "db", sha[0:3], sha)
-    fs.mkdir_p(target_path)
-    shutil.copy(options.input_file, join(target_path, "contents"))
-
+    sha = provider.put(options.input_file)
     print sha
 
 

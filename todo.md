@@ -1,0 +1,2 @@
+- remove MOTH_REPOSITORY env var?
+- rename MOTH_BOOTSTRAP_REPO
