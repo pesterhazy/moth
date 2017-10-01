@@ -15,10 +15,10 @@ To keep things simple, the project defines a number of non-goals:
 
 ## Maturity
 
-Moth is currently in **early development** so expect breaking changes. Essential features are not implemented yet:
+Moth is currently in **early development** so expect breaking changes. Essential missing features:
 
+- ~~S3 backend~~ - [implemented](docs/s3.md)
 - HTTP/HTTPS backend
-- S3 backend
 - Google Cloud Storage backend
 - Authentication
 
