@@ -27,31 +27,6 @@ def fail(msg):
     sys.exit(1)
 
 
-def find_vcs_root(test, dirs=(".git",)):
-    prev, test = None, os.path.abspath(test)
-    while prev != test:
-        if any(os.path.isdir(os.path.join(test, d)) for d in dirs):
-            return test
-        prev, test = test, os.path.abspath(os.path.join(test, os.pardir))
-    raise Exception("No project root found")
-
-
-def split_argv(argv):
-    if '--' in argv:
-        idx = argv.index('--')
-
-        return [argv[:idx], argv[idx + 1:]]
-    else:
-        return [argv, []]
-
-
-# TODO: remove
-def to_repo_base(url):
-    match = re.match("^file:/*(/.*$)", url)
-    assert match, "Must be file URL"
-    return match.group(1)
-
-
 def hash_file(fn):
     return hashlib.sha1(file(fn).read()).hexdigest()
 
