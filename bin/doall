@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+syntax() {
+    cat <<EOF
+Evaluate multiple commands passed as arguments.
+
+Commands are separated with `--` (double dash). If it doesn't precede `--`, the final
+command will be run in the foreground, with stdin connected to the terminal. All other
+commands are sent to the background.
+
+Example:
+
+doall run-daemon -p 8080 -- bash -c "sleep 2 && nc localhost 8080"
+
+EOF
+}
+
+
+invoke() {
+    "$@" &
+    pids+=($!)
+}
+
+invoke_all() {
+    pids=()
+    xs=()
+
+    for arg in "$@"
+    do
+        case "$arg" in
+            --)
+                invoke "${xs[@]}"
+                xs=()
+                ;;
+            *)
+                xs+=("$arg")
+                ;;
+        esac
+    done
+
+    if [[ ${#xs[@]} -ne 0 ]]; then
+        "${xs[@]}"
+    else
+        wait "${pids[@]}"
+    fi
+}
+
+trap "exit" INT TERM
+trap "kill 0" EXIT
+
+invoke_all "$@"

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+bin/doall bin/mock-s3-server -- bash -c 'sleep 1 && bin/faws s3 mb s3://hera && bin/test-s3'
