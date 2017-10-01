@@ -1,5 +1,6 @@
 import os.path
 import json
+import hashlib
 
 
 def find_root(fn):
@@ -27,3 +28,7 @@ def write_manifest(data, root_path):
 
 def pjoin(*args):
     return "/".join(args)
+
+
+def hash_file(fn):
+    return hashlib.sha1(file(fn).read()).hexdigest()
