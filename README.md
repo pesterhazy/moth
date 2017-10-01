@@ -59,10 +59,16 @@ Note that `moth put` prints the SHA hash of the content you just uploaded to the
 You can use this hash to retrieve the dependency again:
 
 ```shell
+./moth get --sha 504b7c6424e6fa94402786315bb58bc1e504bb8f
+```
+
+or download it to the local cache:
+
+```shell
 ./moth show --sha 504b7c6424e6fa94402786315bb58bc1e504bb8f
 ```
 
-You can show the file:
+You can also show the file contents from the local cache. This will download the file only if it isn't present already:
 
 ```shell
 ./moth show --sha 504b7c6424e6fa94402786315bb58bc1e504bb8f --cat

@@ -69,10 +69,8 @@ def action_put(root_path, options):
     print sha
 
 
-def action_get(options):
-    repository = options.repository or os.environ.get("MOTH_REPOSITORY")
-    if not repository:
-        raise UsageException("No repository given")
+def action_get(root_path, options):
+    repository = pick_repository(root_path, options)
     assert options.sha, "Need to pass a sha"
 
     provider = make_provider(repository)
@@ -262,7 +260,7 @@ def run(base_fn):
         if action == "put":
             action_put(util.find_root(base_fn), options)
         elif action == "get":
-            action_get(options)
+            action_get(util.find_root(base_fn), options)
         elif action == "show":
             action_show(util.find_root(base_fn), options)
         elif action == "init":
