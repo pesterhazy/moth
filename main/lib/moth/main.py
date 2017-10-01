@@ -79,32 +79,28 @@ class FileProvider:
         shutil.copy(join(target_path, "contents"), output_file)
 
 
-def pjoin(*args):
-    return "/".join(args)
-
-
 class S3Provider:
     def __init__(self, url):
         self.url_components = urlparse(url)
 
     def put(self, input_file):
         sha = hash_file(input_file)
-        target_path = pjoin(self.url_components.path or "/",
-                            "db", sha[0:3], sha)
+        target_path = util.pjoin(self.url_components.path or "/",
+                                 "db", sha[0:3], sha)
         s3 = boto3.resource('s3', endpoint_url="http://localhost:4568",
                             aws_access_key_id="1234", aws_secret_access_key="1234")
-        s3.Bucket(self.url_components.netloc).upload_file(
-            input_file, target_path.lstrip("/"))
+        bucket = s3.Bucket(self.url_components.netloc)
+        bucket.upload_file(input_file, target_path.lstrip("/"))
 
         return sha
 
     def get(self, sha, output_file):
-        target_path = pjoin(self.url_components.path or "/",
-                            "db", sha[0:3], sha)
+        target_path = util.pjoin(self.url_components.path or "/",
+                                 "db", sha[0:3], sha)
         s3 = boto3.resource('s3', endpoint_url="http://localhost:4568",
                             aws_access_key_id="1234", aws_secret_access_key="1234")
-        s3.Bucket(self.url_components.netloc).download_file(
-            target_path.lstrip("/"), output_file)
+        bucket = s3.Bucket(self.url_components.netloc)
+        bucket.download_file(target_path.lstrip("/"), output_file)
 
 
 def make_provider(url):
@@ -167,10 +163,9 @@ def ensure(sha, repository, target_path):
     content_path = join(target_path, "contents")
 
     if not os.path.isfile(target_path):
-        repo_base = to_repo_base(repository)
-        from_path = join(repo_base, "db", sha[0:3], sha)
+        provider = make_provider(repository)
         fs.mkdir_p(target_path)
-        copy(join(from_path, "contents"), content_path)
+        provider.get(sha, content_path)
 
 
 def show(root_path, options):

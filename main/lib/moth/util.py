@@ -23,3 +23,7 @@ def write_manifest(data, root_path):
 
     with open(fname, 'w') as out:
         json.dump(data, out, indent=4, separators=(',', ': '))
+
+
+def pjoin(*args):
+    return "/".join(args)
