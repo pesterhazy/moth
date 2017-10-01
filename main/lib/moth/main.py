@@ -73,6 +73,10 @@ class FileProvider:
 
         return sha
 
+    def get(self, sha, output_file):
+        target_path = join(self.repo_base, "db", sha[0:3], sha)
+        shutil.copy(join(target_path, "contents"), output_file)
+
 
 def pjoin(*args):
     return "/".join(args)
@@ -85,11 +89,17 @@ class S3Provider:
     def put(self, input_file):
         sha = hash_file(input_file)
         target_path = pjoin(self.url_components.path or "/",
-                                "db", sha[0:3], sha)
+                            "db", sha[0:3], sha)
         s3 = boto3.resource('s3', endpoint_url="http://localhost:4568", aws_access_key_id="1234", aws_secret_access_key="1234")
-        s3.Bucket(self.url_components.netloc).upload_file(input_file, target_path)
+        s3.Bucket(self.url_components.netloc).upload_file(input_file, target_path.lstrip("/"))
 
         return sha
+
+    def get(self, sha, output_file):
+        target_path = pjoin(self.url_components.path or "/",
+                            "db", sha[0:3], sha)
+        s3 = boto3.resource('s3', endpoint_url="http://localhost:4568", aws_access_key_id="1234", aws_secret_access_key="1234")
+        s3.Bucket(self.url_components.netloc).download_file(target_path.lstrip("/"), output_file)
 
 
 def make_provider(url):
@@ -117,10 +127,8 @@ def get(options):
     assert repository
     assert options.sha, "Need to pass a sha"
 
-    repo_base = to_repo_base(repository)
-    target_path = join(repo_base, "db", options.sha[0:3], options.sha)
-    shutil.copy(join(target_path, "contents"),
-                options.output_file or "/dev/stdout")
+    provider = make_provider(repository)
+    provider.get(options.sha, options.output_file or "/dev/stdout")
 
 
 def to_db_path(root_path):
