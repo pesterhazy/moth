@@ -9,9 +9,11 @@ from os.path import join
 from optparse import OptionParser
 import moth.version
 import util
+from util import UsageException
 import fs
 
 import s3
+import file_provider
 
 
 def croak():
@@ -25,32 +27,9 @@ def fail(msg):
     sys.exit(1)
 
 
-class FileProvider:
-    def __init__(self, url):
-        self.repo_base = self.to_repo_base(url)
-        pass
-
-    def to_repo_base(self, url):
-        match = re.match("^file:/*(/.*$)", url)
-        assert match, "Must be file URL"
-        return match.group(1)
-
-    def put(self, input_file):
-        sha = util.hash_file(input_file)
-        target_path = join(self.repo_base, "db", sha[0:3], sha)
-        fs.mkdir_p(target_path)
-        shutil.copy(input_file, join(target_path, "contents"))
-
-        return sha
-
-    def get(self, sha, output_file):
-        target_path = join(self.repo_base, "db", sha[0:3], sha)
-        shutil.copy(join(target_path, "contents"), output_file)
-
-
 def make_provider(url):
     if url.startswith("file:"):
-        return FileProvider(url)
+        return file_provider.FileProvider(url)
     elif url.startswith("s3:"):
         return s3.S3Provider(url)
 
@@ -59,7 +38,8 @@ def make_provider(url):
 
 def put(options):
     repository = options.repository or os.environ.get("MOTH_REPOSITORY")
-    assert repository
+    if not repository:
+        raise UsageException("No repository given")
     assert options.input_file
 
     provider = make_provider(repository)
@@ -70,7 +50,8 @@ def put(options):
 
 def get(options):
     repository = options.repository or os.environ.get("MOTH_REPOSITORY")
-    assert repository
+    if not repository:
+        raise UsageException("No repository given")
     assert options.sha, "Need to pass a sha"
 
     provider = make_provider(repository)
@@ -104,7 +85,9 @@ def cat_or_print(fn, cat):
 
 
 def ensure(sha, repository, target_path):
-    assert repository
+    if not repository:
+        raise UsageException("No repository given")
+
     content_path = join(target_path, "contents")
 
     if not os.path.isfile(target_path):
@@ -160,7 +143,9 @@ def show(root_path, options):
 def init(options):
     assert not os.path.exists("moth.json"), "File already exists: moth.json"
 
-    assert options.repository
+    if not options.repository:
+        raise UsageException("No repository given")
+
 
     data = {"repositories": [{"url": options.repository}]}
 
@@ -231,38 +216,42 @@ Retrieving data
 
 
 def run(base_fn):
-    parser = OptionParser()
-    parser.add_option("--repository", dest="repository")
-    parser.add_option("--input-file", dest="input_file")
-    parser.add_option("--output-file", dest="output_file")
-    parser.add_option("--sha", dest="sha")
-    parser.add_option("--alias", dest="alias")
-    parser.add_option("--find", dest="find")
-    parser.add_option("--workspace", dest="workspace", action="store_true")
-    parser.add_option("--cat", dest="cat", action="store_true")
-    (options, args) = parser.parse_args()
+    try:
+        parser = OptionParser()
+        parser.add_option("--repository", dest="repository")
+        parser.add_option("--input-file", dest="input_file")
+        parser.add_option("--output-file", dest="output_file")
+        parser.add_option("--sha", dest="sha")
+        parser.add_option("--alias", dest="alias")
+        parser.add_option("--find", dest="find")
+        parser.add_option("--workspace", dest="workspace", action="store_true")
+        parser.add_option("--cat", dest="cat", action="store_true")
+        (options, args) = parser.parse_args()
 
-    if len(args) == 0:
-        action = "default"
-    elif len(args) > 1:
-        fail("Too many positional arguments")
-    else:
-        action = args[0]
+        if len(args) == 0:
+            action = "default"
+        elif len(args) > 1:
+            fail("Too many positional arguments")
+        else:
+            action = args[0]
 
-    if action == "put":
-        put(options)
-    elif action == "get":
-        get(options)
-    elif action == "show":
-        show(util.find_root(base_fn), options)
-    elif action == "init":
-        init(options)
-    elif action == "alias":
-        action_alias(util.find_root(base_fn), options)
-    elif action == "version":
-        print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
-    elif action in ["default", "help"]:
-        help_message()
-    else:
-        fail("Unknown action: " + action)
+        if action == "put":
+            put(options)
+        elif action == "get":
+            get(options)
+        elif action == "show":
+            show(util.find_root(base_fn), options)
+        elif action == "init":
+            init(options)
+        elif action == "alias":
+            action_alias(util.find_root(base_fn), options)
+        elif action == "version":
+            print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
+        elif action in ["default", "help"]:
+            help_message()
+        else:
+            fail("Unknown action: " + action)
+            sys.exit(1)
+    except UsageException as e:
+        sys.stderr.write("Error: " + e.message + "\n")
         sys.exit(1)

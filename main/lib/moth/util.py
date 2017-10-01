@@ -3,6 +3,10 @@ import json
 import hashlib
 
 
+class UsageException(Exception):
+    pass
+
+
 def find_root(fn):
     prev, fn = None, os.path.abspath(fn)
     while prev != fn:
