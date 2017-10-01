@@ -15,6 +15,7 @@ import fs
 from urlparse import urlparse
 import boto3
 
+
 def croak():
     print '\xe2\x9b\x94\xef\xb8\x8f'
     sys.exit(1)
@@ -90,16 +91,20 @@ class S3Provider:
         sha = hash_file(input_file)
         target_path = pjoin(self.url_components.path or "/",
                             "db", sha[0:3], sha)
-        s3 = boto3.resource('s3', endpoint_url="http://localhost:4568", aws_access_key_id="1234", aws_secret_access_key="1234")
-        s3.Bucket(self.url_components.netloc).upload_file(input_file, target_path.lstrip("/"))
+        s3 = boto3.resource('s3', endpoint_url="http://localhost:4568",
+                            aws_access_key_id="1234", aws_secret_access_key="1234")
+        s3.Bucket(self.url_components.netloc).upload_file(
+            input_file, target_path.lstrip("/"))
 
         return sha
 
     def get(self, sha, output_file):
         target_path = pjoin(self.url_components.path or "/",
                             "db", sha[0:3], sha)
-        s3 = boto3.resource('s3', endpoint_url="http://localhost:4568", aws_access_key_id="1234", aws_secret_access_key="1234")
-        s3.Bucket(self.url_components.netloc).download_file(target_path.lstrip("/"), output_file)
+        s3 = boto3.resource('s3', endpoint_url="http://localhost:4568",
+                            aws_access_key_id="1234", aws_secret_access_key="1234")
+        s3.Bucket(self.url_components.netloc).download_file(
+            target_path.lstrip("/"), output_file)
 
 
 def make_provider(url):
@@ -171,7 +176,8 @@ def ensure(sha, repository, target_path):
 def show(root_path, options):
     repository = options.repository or os.environ.get("MOTH_REPOSITORY")
 
-    sha = resolve_alias(root_path, options.alias) if options.alias else options.sha
+    sha = resolve_alias(
+        root_path, options.alias) if options.alias else options.sha
     assert sha, "You need to specify a sha"
 
     target_path = join(to_db_path(root_path), sha[0:3], sha)
@@ -210,6 +216,7 @@ def show(root_path, options):
     else:
         cat_or_print(content_path, options.cat)
 
+
 def init(options):
     assert not os.path.exists("moth.json"), "File already exists: moth.json"
 
@@ -217,15 +224,17 @@ def init(options):
 
     data = {"repositories": [{"url": options.repository}]}
 
-    with open("moth.json","w") as out:
+    with open("moth.json", "w") as out:
         json.dump(data, out, indent=4, separators=(',', ': '))
 
     print "Initialized moth project in current directory"
     print
     print "Initial repository:", options.repository
 
+
 def is_valid_sha(s):
     return bool(re.match("^[0-9a-f]{40}$", s))
+
 
 def action_alias(root_path, options):
     sha = options.sha
@@ -236,7 +245,7 @@ def action_alias(root_path, options):
     repository = options.repository or os.environ.get("MOTH_REPOSITORY")
 
     target_path = join(to_db_path(root_path), sha[0:3], sha)
-    ensure(sha, repository,target_path)
+    ensure(sha, repository, target_path)
 
     manifest = util.read_manifest(root_path)
     if not manifest.get("aliases"):
@@ -245,7 +254,7 @@ def action_alias(root_path, options):
     if not manifest["aliases"].get(options.alias):
         manifest["aliases"][options.alias] = {}
 
-    if manifest["aliases"].get(options.alias,{}).get("sha") == sha:
+    if manifest["aliases"].get(options.alias, {}).get("sha") == sha:
         print "Alias already up to date"
         return
 
@@ -257,6 +266,7 @@ def action_alias(root_path, options):
     manifest["aliases"][options.alias]["sha"] = sha
 
     util.write_manifest(manifest, root_path)
+
 
 def help_message():
     # Remember to update README.md as well!
