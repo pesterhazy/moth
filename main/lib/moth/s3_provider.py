@@ -16,12 +16,12 @@ class S3Provider:
     def put(self, input_file):
         sha = util.hash_file(input_file)
         target_path = util.pjoin(self.url_components.path or "/",
-                                 "db", sha[0:3], sha)
+                                 "db", sha[0:3], sha, "contents")
         self.bucket.upload_file(input_file, target_path.lstrip("/"))
 
         return sha
 
     def get(self, sha, output_file):
         target_path = util.pjoin(self.url_components.path or "/",
-                                 "db", sha[0:3], sha)
+                                 "db", sha[0:3], sha, "contents")
         self.bucket.download_file(target_path.lstrip("/"), output_file)
