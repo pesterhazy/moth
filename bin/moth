@@ -6,4 +6,4 @@ myroot="$(dirname "${BASH_SOURCE[0]}")/.."
 venv=$(cat "$myroot/.venv")
 
 export PATH="$venv/bin:$PATH"
-exec "$myroot/bin/moth_dev"
+exec "$myroot/bin/moth_dev" "$@"

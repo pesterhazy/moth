@@ -1,0 +1,12 @@
+{
+    "repositories": [
+        {
+            "url": "s3://tyche-test"
+        }
+    ],
+    "aliases": {
+        "hosts": {
+            "sha": "ecce3da617dd874317f8a2752413bc1dadd4808e"
+        }
+    }
+}
