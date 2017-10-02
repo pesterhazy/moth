@@ -3,7 +3,7 @@
 set -euo pipefail
 
 myroot="$(dirname "${BASH_SOURCE[0]}")/.."
-venv=$(cat "$myroot/.venv")
+myvenv=$(cat "$myroot/.myvenv")
 
-export PATH="$venv/bin:$PATH"
+export PATH="$myvenv/bin:$PATH"
 exec "$myroot/bin/moth_dev" "$@"

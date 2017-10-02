@@ -4,10 +4,14 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
+
 "autopep8" = "*"
 ipython = "*"
 
 
 
 [packages]
+
 "boto3" = "*"
+requests = "*"
+clint = "*"

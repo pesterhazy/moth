@@ -11,3 +11,4 @@ mock-s3
 foo
 node_modules/
 .venv
+/.myvenv
