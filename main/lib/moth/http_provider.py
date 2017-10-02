@@ -1,5 +1,7 @@
-import requests
 import util
+import requests
+from clint.textui import progress
+
 
 
 class HTTPProvider:
@@ -10,7 +12,15 @@ class HTTPProvider:
         raise Exception("HTTPProvider cannot be used to upload objects")
 
     def download(self, frm, to):
-        assert False, "Boom"
+        r = requests.get(frm, stream=True)
+        r.raise_for_status()
+        with open(to, 'wb') as f:
+            total_length = int(r.headers.get('content-length'))
+            for chunk in progress.bar(r.iter_content(chunk_size=1024),
+                                      expected_size=(total_length/1024) + 1):
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
 
     def put(self, input_file):
         sha = util.hash_file(input_file)
