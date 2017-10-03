@@ -4,4 +4,4 @@ set -euo pipefail
 
 rm -rf mock-s3
 mkdir -p mock-s3
-node_modules/.bin/s3rver -d mock-s3
+node_modules/.bin/s3rver -d tests/repo -p 50002
