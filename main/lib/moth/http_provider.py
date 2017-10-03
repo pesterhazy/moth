@@ -38,5 +38,6 @@ class HTTPProvider:
         raise Exception("HTTPProvider cannot be used to upload objects")
 
     def get(self, sha, output_file):
-        target_path = util.pjoin(self.url, "db", sha[0:3], sha, "contents")
+        target_path = util.pjoin(self.url.rstrip("/"),
+                                 "db", sha[0:3], sha, "contents")
         self.download(target_path, output_file)
