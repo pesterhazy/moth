@@ -1,2 +1,0 @@
-- what if no Content-Length header?
-- add SHA verification for downloads
