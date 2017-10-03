@@ -3,6 +3,13 @@
 set -euo pipefail
 
 myroot="$(dirname "${BASH_SOURCE[0]}")/.."
+
+if ! [[ -f "$myroot/.myvenv" ]]; then
+    pushd "$myroot"
+    pipenv --venv > .myvenv
+    popd
+fi
+
 myvenv=$(cat "$myroot/.myvenv")
 
 export PATH="$myvenv/bin:$PATH"
