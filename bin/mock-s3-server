@@ -3,4 +3,4 @@
 set -euo pipefail
 
 mkdir -p tests/repo-s3
-node_modules/.bin/s3rver -d tests/repo-s3 -p 50002
+node_modules/.bin/s3rver -d tests/repo-s3 -p 50001
