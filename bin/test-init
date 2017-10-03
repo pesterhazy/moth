@@ -11,6 +11,7 @@ set -x
 
 export PATH="$PWD/bin:$PATH"
 
+base_path="$PWD"
 file_repo="$PWD/tests/repo-file"
 
 cd "$our_temp_dir"
@@ -19,6 +20,9 @@ export AWS_ACCESS_KEY_ID="1234"
 export AWS_SECRET_ACCESS_KEY="1234"
 export MOTH_S3_ENDPOINT="http://localhost:50002"
 
-moth get --repo "file:$file_repo" --sha dffe111febc8b2049e9265c5404f71dcd626cbb6
-moth get --repo http://localhost:50002/mybucket --sha dffe111febc8b2049e9265c5404f71dcd626cbb6
-moth get --repo s3://mybucket --sha dffe111febc8b2049e9265c5404f71dcd626cbb6
+rm -fr "$base_path/tests/repo-s3"
+rm -fr "$base_path/tests/repo-file"
+
+faws s3 mb s3://mybucket
+moth put --repo "file:$file_repo" --input-file "$base_path/example/crocodile.txt"
+moth put --repo s3://mybucket/ --input-file "$base_path/example/crocodile.txt"
