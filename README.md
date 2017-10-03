@@ -15,12 +15,7 @@ To keep things simple, the project defines a number of non-goals:
 
 ## Maturity
 
-Moth is currently in **early development** so expect breaking changes. Essential missing features:
-
-- ~~S3 backend~~ - [implemented](docs/s3.md)
-- HTTP/HTTPS backend
-- Google Cloud Storage backend
-- Authentication
+Moth is currently in **early development**; expect breaking changes.
 
 ## Getting started
 
@@ -157,6 +152,14 @@ Retrieving data
 
   show      Read object
 ```
+
+## URL types
+
+The following URL types are implemented:
+
+- `s3://` - S3-based repository. As this backend is ased on the [boto](https://github.com/boto/boto3) library, refer to its [documentation](http://boto3.readthedocs.io/en/latest/guide/configuration.html) for how to specify credientials. Credentials can be specified using the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables or using the `~/.aws/credentials` configuration file. Example: `s3://mybucket`
+- `http://` and `https://` - Read-only repository accessed via HTTP(S). The https backend can be used to access any unauthenticated, world-readable S3 bucket. Example: `https://mybucket.s3.amazonaws.com/`
+- `file://` - local file system repository. Mostly for testing `file://home/user/repo`
 
 ## License
 
