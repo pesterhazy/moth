@@ -5,4 +5,4 @@ set -x
 
 bin/test-literal
 
-bin/doall bin/mock-s3-server -- bash -c 'sleep 1 && bin/faws s3 mb s3://hera && bin/test-s3'
+bin/doall bin/mock-s3-server -- bash -c 'sleep 1 && bin/faws s3 mb s3://mybucket && bin/test-s3'
