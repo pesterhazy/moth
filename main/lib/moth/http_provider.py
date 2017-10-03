@@ -1,4 +1,5 @@
 import util
+from util import UsageException
 import requests
 from clint.textui import progress
 
@@ -35,7 +36,7 @@ class HTTPProvider:
                 process(f=f, r=r, chunk_size=chunk_size)
 
     def put(self, input_file):
-        raise Exception("HTTPProvider cannot be used to upload objects")
+        raise UsageException("HTTPProvider cannot be used to upload objects")
 
     def get(self, sha, output_file):
         target_path = util.pjoin(self.url.rstrip("/"),
