@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-exec node_modules/.bin/http-server -p 50403 repo
+exec node_modules/.bin/http-server -p 50001 tests/repo

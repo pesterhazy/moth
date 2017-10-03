@@ -7,11 +7,11 @@ our_temp_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'our_temp_dir')
 function cleanup_temp_dir() { rm -rf "$our_temp_dir" ; } && trap "cleanup_temp_dir" EXIT
 # end our_temp_dir
 
-node_modules/.bin/codedown shell < docs/s3.md > "$our_temp_dir/transcript"
-
 set -x
 
 export PATH="$PWD/bin:$PATH"
+
+file_repo="$PWD/tests/repo-file"
 
 cd "$our_temp_dir"
 
@@ -19,4 +19,6 @@ export AWS_ACCESS_KEY_ID="1234"
 export AWS_SECRET_ACCESS_KEY="1234"
 export MOTH_S3_ENDPOINT="http://localhost:50001"
 
-source transcript
+moth get --repo "file:$file_repo" --sha dffe111febc8b2049e9265c5404f71dcd626cbb6
+moth get --repo http://localhost:50001/mybucket --sha dffe111febc8b2049e9265c5404f71dcd626cbb6
+moth get --repo s3://mybucket --sha dffe111febc8b2049e9265c5404f71dcd626cbb6

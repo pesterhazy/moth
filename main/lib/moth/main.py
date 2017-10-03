@@ -14,6 +14,7 @@ import fs
 
 import s3_provider
 import file_provider
+import http_provider
 
 
 def croak():
@@ -41,6 +42,8 @@ def dbg(*args):
 def make_provider(url):
     if url.startswith("file:"):
         return file_provider.FileProvider(url)
+    elif url.startswith("http:") or url.startswith("https:"):
+        return http_provider.HTTPProvider(url)
     elif url.startswith("s3:"):
         return s3_provider.S3Provider(url)
 
