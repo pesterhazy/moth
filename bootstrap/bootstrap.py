@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+import errno
 import os
 import sys
 import urllib2
@@ -60,7 +61,8 @@ def bootstrap(sha, target_file):
 def get_zip_path(sha):
     self_path = os.path.dirname(__file__)
     root_path = find_root(self_path)
-    return os.path.abspath(os.path.join(root_path, ".moth", "db", sha[0:3], sha, "contents"))
+    return os.path.abspath(os.path.join(root_path, ".moth",
+                                        "db", sha[0:3], sha, "contents"))
 
 
 ZIP_PATH = get_zip_path(MAIN_SHA)
