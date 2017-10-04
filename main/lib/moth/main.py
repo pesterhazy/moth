@@ -17,11 +17,6 @@ import file_provider
 import http_provider
 
 
-def croak():
-    print '\xe2\x9b\x94\xef\xb8\x8f'
-    sys.exit(1)
-
-
 def fail(msg):
     sys.stderr.write(msg)
     sys.stderr.write("\n")
@@ -83,7 +78,7 @@ def action_get(root_path, options):
     assert options.sha, "Need to pass a sha"
 
     provider = make_provider(repository)
-    provider.get(options.sha, options.output_file or "/dev/stdout")
+    provider.verified_get(options.sha, options.output_file or "/dev/stdout")
 
 
 def to_db_path(root_path):
@@ -118,10 +113,10 @@ def ensure(sha, repository, target_path):
 
     content_path = join(target_path, "contents")
 
-    if not os.path.isfile(target_path):
+    if not os.path.isfile(content_path):
         provider = make_provider(repository)
         fs.mkdir_p(target_path)
-        provider.get(sha, content_path)
+        provider.safe_get(sha, content_path)
 
 
 def action_show(root_path, options):
