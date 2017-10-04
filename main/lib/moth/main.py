@@ -78,7 +78,7 @@ def action_get(root_path, options):
     assert options.sha, "Need to pass a sha"
 
     provider = make_provider(repository)
-    provider.get(options.sha, options.output_file or "/dev/stdout")
+    provider.verified_get(options.sha, options.output_file or "/dev/stdout")
 
 
 def to_db_path(root_path):
