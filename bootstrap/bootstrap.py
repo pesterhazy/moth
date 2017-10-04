@@ -26,14 +26,13 @@ def mkdir_p(path):
             raise
 
 
-def cache_base_path():
-    return os.path.expanduser("~/.cache/moth")
+def cache_path(*args):
+    xs = [ os.path.expanduser("~"),
+           ".cache",
+           "moth",
+           "binaries" ] + list(args)
 
-
-def banana():
-    path = os.path.join(cache_base_path(), "binary", get_main_sha())
-
-    print path
+    return os.path.join(*xs)
 
 
 def find_root(fn):
@@ -81,8 +80,9 @@ def get_zip_path(sha):
     return os.path.abspath(os.path.join(root_path, ".moth",
                                         "db", sha[0:3], sha, "contents"))
 
+
 def start():
-    ZIP_PATH = get_zip_path(get_main_sha())
+    ZIP_PATH = cache_path(get_main_sha()+".zip")
 
     if os.path.exists(ZIP_PATH):
         sys.path.insert(0, ZIP_PATH)
@@ -100,4 +100,4 @@ def start():
     moth.main.run(os.path.dirname(__file__))
 
 
-banana()
+start()
