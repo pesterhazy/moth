@@ -17,11 +17,6 @@ import file_provider
 import http_provider
 
 
-def croak():
-    print '\xe2\x9b\x94\xef\xb8\x8f'
-    sys.exit(1)
-
-
 def fail(msg):
     sys.stderr.write(msg)
     sys.stderr.write("\n")
@@ -118,10 +113,10 @@ def ensure(sha, repository, target_path):
 
     content_path = join(target_path, "contents")
 
-    if not os.path.isfile(target_path):
+    if not os.path.isfile(content_path):
         provider = make_provider(repository)
         fs.mkdir_p(target_path)
-        provider.get(sha, content_path)
+        provider.safe_get(sha, content_path)
 
 
 def action_show(root_path, options):

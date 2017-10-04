@@ -1,10 +1,11 @@
 import boto3
 import util
 import os
+import provider
 from urlparse import urlparse
 
 
-class S3Provider:
+class S3Provider(provider.Provider):
     def __init__(self, url):
         self.url_components = urlparse(url)
         opts = {}

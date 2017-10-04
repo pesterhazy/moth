@@ -1,3 +1,4 @@
+import provider
 import re
 import util
 import fs
@@ -5,7 +6,7 @@ import shutil
 import os.path
 
 
-class FileProvider:
+class FileProvider(provider.Provider):
     def __init__(self, url):
         self.repo_base = self.to_repo_base(url)
         pass
