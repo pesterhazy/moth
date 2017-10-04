@@ -9,6 +9,13 @@ import hashlib
 MAIN_SHA = "SHA_GOES_HERE"
 
 
+def get_main_sha():
+    if MAIN_SHA == "SHA_GOES_HERE":
+        return os.environ["MOTH_VERSION"]
+    else:
+        return MAIN_SHA
+
+
 def mkdir_p(path):
     try:
         os.makedirs(path)
@@ -17,6 +24,16 @@ def mkdir_p(path):
             pass
         else:
             raise
+
+
+def cache_base_path():
+    return os.path.expanduser("~/.cache/moth")
+
+
+def banana():
+    path = os.path.join(cache_base_path(), "binary", get_main_sha())
+
+    print path
 
 
 def find_root(fn):
@@ -34,7 +51,7 @@ def bootstrap(sha, target_file):
         url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
     else:
         url = "https://github.com/pesterhazy/moth/releases/download/r" + \
-            MAIN_SHA + "/moth_release.zip"
+            get_main_sha() + "/moth_release.zip"
 
     sys.stderr.write("*** " + target_file +
                      " not found.\n*** Attempting to bootstrap\n***\n")
@@ -64,20 +81,23 @@ def get_zip_path(sha):
     return os.path.abspath(os.path.join(root_path, ".moth",
                                         "db", sha[0:3], sha, "contents"))
 
-
-ZIP_PATH = get_zip_path(MAIN_SHA)
-
-if os.path.exists(ZIP_PATH):
-    sys.path.insert(0, ZIP_PATH)
-
-try:
-    import moth.main
-except ImportError:
-    bootstrap(MAIN_SHA, ZIP_PATH)
+def start():
+    ZIP_PATH = get_zip_path(get_main_sha())
 
     if os.path.exists(ZIP_PATH):
         sys.path.insert(0, ZIP_PATH)
 
-    import moth.main
+    try:
+        import moth.main
+    except ImportError:
+        bootstrap(get_main_sha(), ZIP_PATH)
 
-moth.main.run(os.path.dirname(__file__))
+        if os.path.exists(ZIP_PATH):
+            sys.path.insert(0, ZIP_PATH)
+
+        import moth.main
+
+    moth.main.run(os.path.dirname(__file__))
+
+
+banana()
