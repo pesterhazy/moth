@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 
 import errno
 import os
@@ -30,19 +31,38 @@ def cache_base_path():
     return os.path.expanduser("~/.cache/moth")
 
 
+spinner_images = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+
+
 def download(url, sha, target_file):
-    contents = urllib2.urlopen(url).read()
+    url_file = urllib2.urlopen(url)
 
-    downloaded_sha = hashlib.sha1(contents).hexdigest()
+    # downloaded_sha = hashlib.sha1(contents).hexdigest()
 
-    if downloaded_sha != sha:
-        raise Exception("Downloaded sha " + downloaded_sha +
-                        " does not match expected value " + sha)
+    # if downloaded_sha != sha:
+    #     raise Exception("Downloaded sha " + downloaded_sha +
+    #                     " does not match expected value " + sha)
 
     mkdir_p(os.path.dirname(target_file))
 
     with open(target_file, "w") as out:
-        out.write(contents)
+        n_chunks = 0
+        chunk_size = 1024 * 64
+        image = spinner_images[len(spinner_images)-1]
+        sys.stderr.write(image)
+        sys.stderr.flush()
+        while 1:
+            data = url_file.read(chunk_size)
+            if not data:
+                break
+            out.write(data)
+            sys.stderr.write("\b")
+            image = spinner_images[n_chunks % len(spinner_images)]
+            sys.stderr.write(image)
+            sys.stderr.flush()
+            n_chunks += 1
+
+        sys.stderr.write("\b")
 
 
 def bootstrap(sha, target_file):
@@ -53,12 +73,12 @@ def bootstrap(sha, target_file):
         url = "https://github.com/pesterhazy/moth/releases/download/r" + \
             get_main_sha() + "/moth_release.zip"
 
-    sys.stderr.write("moth: bootstrapping version " + sha + ":")
+    sys.stderr.write("moth: bootstrapping version " + sha + ": ")
     sys.stderr.flush()
 
     download(url, sha, target_file)
 
-    sys.stderr.write(" done.\n")
+    sys.stderr.write("done.\n")
 
 
 def get_zip_path(sha):
