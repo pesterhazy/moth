@@ -47,11 +47,16 @@ spinner_images = ["[    ]",
                   "[=   ]"]
 
 
+def echo(s):
+    if sys.stderr.isatty():
+        sys.stderr.write(s)
+        sys.stderr.flush()
+
+
 def download(url, sha, target_file):
     url_file = urllib2.urlopen(url)
 
     hasher = hashlib.sha1()
-
 
     mkdir_p(os.path.dirname(target_file))
 
@@ -59,24 +64,20 @@ def download(url, sha, target_file):
         n_chunks = 0
         chunk_size = 1024 * 64
         image = spinner_images[len(spinner_images) - 1]
-        sys.stderr.write(image)
-        sys.stderr.flush()
+        echo(image)
         while 1:
             data = url_file.read(chunk_size)
             if not data:
                 break
             hasher.update(data)
             out.write(data)
-            sys.stderr.write("\b" * len(spinner_images[0]))
-            image = spinner_images[n_chunks % len(spinner_images)]
-            sys.stderr.write(image)
-            sys.stderr.flush()
+            echo("\b" * len(spinner_images[0]))
+            echo(spinner_images[n_chunks % len(spinner_images)])
             n_chunks += 1
 
-    sys.stderr.write("\b" * (len(spinner_images[0])))
-    sys.stderr.write(" " * (len(spinner_images[0])))
-    sys.stderr.write("\b" * (len(spinner_images[0])))
-    sys.stderr.flush()
+    echo("\b" * (len(spinner_images[0])) +
+         " " * (len(spinner_images[0])) +
+         "\b" * (len(spinner_images[0])))
 
     downloaded_sha = hasher.hexdigest()
 
