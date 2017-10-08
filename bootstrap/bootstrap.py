@@ -48,7 +48,7 @@ def download(url, sha, target_file):
     with open(target_file, "w") as out:
         n_chunks = 0
         chunk_size = 1024 * 64
-        image = spinner_images[len(spinner_images)-1]
+        image = spinner_images[len(spinner_images) - 1]
         sys.stderr.write(image)
         sys.stderr.flush()
         while 1:

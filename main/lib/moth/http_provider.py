@@ -8,7 +8,7 @@ from clint.textui import progress
 def process_progress(f, r, chunk_size, content_length):
     total_length = int(content_length)
     for chunk in progress.bar(r.iter_content(chunk_size=chunk_size),
-                              expected_size=(total_length/chunk_size) + 1):
+                              expected_size=(total_length / chunk_size) + 1):
         if chunk:
             f.write(chunk)
 
