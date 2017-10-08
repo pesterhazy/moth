@@ -30,21 +30,6 @@ def cache_base_path():
     return os.path.expanduser("~/.cache/moth")
 
 
-def banana():
-    path = os.path.join(cache_base_path(), "binary", get_main_sha())
-
-    print path
-
-
-def find_root(fn):
-    prev, fn = None, os.path.abspath(fn)
-    while prev != fn:
-        if os.path.isfile(os.path.join(fn, "moth.json")):
-            return fn
-        prev, fn = fn, os.path.abspath(os.path.join(fn, os.pardir))
-    return os.path.abspath(".")
-
-
 def bootstrap(sha, target_file):
     if os.environ.get("MOTH_BOOTSTRAP_REPO") is not None:
         base_url = os.environ.get("MOTH_BOOTSTRAP_REPO")
@@ -76,10 +61,8 @@ def bootstrap(sha, target_file):
 
 
 def get_zip_path(sha):
-    self_path = os.path.dirname(__file__)
-    root_path = find_root(self_path)
-    return os.path.abspath(os.path.join(root_path, ".moth",
-                                        "db", sha[0:3], sha, "contents"))
+    return os.path.join(cache_base_path(), "binary", sha)
+
 
 def start():
     ZIP_PATH = get_zip_path(get_main_sha())
@@ -100,4 +83,4 @@ def start():
     moth.main.run(os.path.dirname(__file__))
 
 
-banana()
+start()
