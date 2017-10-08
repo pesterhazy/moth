@@ -1,5 +1,4 @@
 #!/usr/bin/env python2
-# -*- coding: utf-8 -*-
 
 import errno
 import os
@@ -31,17 +30,28 @@ def cache_base_path():
     return os.path.expanduser("~/.cache/moth")
 
 
-spinner_images = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+spinner_images = ["[    ]",
+                  "[=   ]",
+                  "[==  ]",
+                  "[=== ]",
+                  "[ ===]",
+                  "[  ==]",
+                  "[   =]",
+                  "[    ]",
+                  "[   =]",
+                  "[  ==]",
+                  "[ ===]",
+                  "[====]",
+                  "[=== ]",
+                  "[==  ]",
+                  "[=   ]"]
 
 
 def download(url, sha, target_file):
     url_file = urllib2.urlopen(url)
 
-    # downloaded_sha = hashlib.sha1(contents).hexdigest()
+    hasher = hashlib.sha1()
 
-    # if downloaded_sha != sha:
-    #     raise Exception("Downloaded sha " + downloaded_sha +
-    #                     " does not match expected value " + sha)
 
     mkdir_p(os.path.dirname(target_file))
 
@@ -55,14 +65,24 @@ def download(url, sha, target_file):
             data = url_file.read(chunk_size)
             if not data:
                 break
+            hasher.update(data)
             out.write(data)
-            sys.stderr.write("\b")
+            sys.stderr.write("\b" * len(spinner_images[0]))
             image = spinner_images[n_chunks % len(spinner_images)]
             sys.stderr.write(image)
             sys.stderr.flush()
             n_chunks += 1
 
-        sys.stderr.write("\b")
+    sys.stderr.write("\b" * (len(spinner_images[0])))
+    sys.stderr.write(" " * (len(spinner_images[0])))
+    sys.stderr.write("\b" * (len(spinner_images[0])))
+    sys.stderr.flush()
+
+    downloaded_sha = hasher.hexdigest()
+
+    if downloaded_sha != sha:
+        raise Exception("Downloaded sha " + downloaded_sha +
+                        " does not match expected value " + sha)
 
 
 def bootstrap(sha, target_file):
