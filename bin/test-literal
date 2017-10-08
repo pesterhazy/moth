@@ -7,18 +7,15 @@ our_temp_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'our_temp_dir')
 function cleanup_temp_dir() { rm -rf "$our_temp_dir" ; } && trap "cleanup_temp_dir" EXIT
 # end our_temp_dir
 
-if [[ "${1-}" == "--remote" ]]; then
-    node_modules/.bin/codedown shell < README.md > "$our_temp_dir/transcript"
-else
-    node_modules/.bin/codedown shell < README.md | grep -v  github.com/pesterhazy/moth/releases > "$our_temp_dir/transcript"
-    cp bin/mothg "$our_temp_dir/moth"
-    export MOTH_BOOTSTRAP_REPO="file:$PWD/repo"
-fi
-
 set -x
+
+node_modules/.bin/codedown shell < README.md > "$our_temp_dir/transcript"
+cp bin/mothg "$our_temp_dir/moth"
 
 export PATH="$PWD/bin:$PATH"
 
 cd "$our_temp_dir"
 
 source transcript
+
+./moth version
