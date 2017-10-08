@@ -38,10 +38,7 @@ def bootstrap(sha, target_file):
         url = "https://github.com/pesterhazy/moth/releases/download/r" + \
             get_main_sha() + "/moth_release.zip"
 
-    sys.stderr.write("*** " + target_file +
-                     " not found.\n*** Attempting to bootstrap\n***\n")
-    sys.stderr.write("*** Downloading: " + url + "...")
-
+    sys.stderr.write("moth: bootstrapping version " + sha + ":")
     sys.stderr.flush()
 
     contents = urllib2.urlopen(url).read()
@@ -57,7 +54,7 @@ def bootstrap(sha, target_file):
     with open(target_file, "w") as out:
         out.write(contents)
 
-    sys.stderr.write(" done.\n***\n\n")
+    sys.stderr.write(" done.\n")
 
 
 def get_zip_path(sha):
