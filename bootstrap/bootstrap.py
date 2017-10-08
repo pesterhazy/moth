@@ -30,17 +30,7 @@ def cache_base_path():
     return os.path.expanduser("~/.cache/moth")
 
 
-def bootstrap(sha, target_file):
-    if os.environ.get("MOTH_BOOTSTRAP_REPO") is not None:
-        base_url = os.environ.get("MOTH_BOOTSTRAP_REPO")
-        url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
-    else:
-        url = "https://github.com/pesterhazy/moth/releases/download/r" + \
-            get_main_sha() + "/moth_release.zip"
-
-    sys.stderr.write("moth: bootstrapping version " + sha + ":")
-    sys.stderr.flush()
-
+def download(url, sha, target_file):
     contents = urllib2.urlopen(url).read()
 
     downloaded_sha = hashlib.sha1(contents).hexdigest()
@@ -53,6 +43,20 @@ def bootstrap(sha, target_file):
 
     with open(target_file, "w") as out:
         out.write(contents)
+
+
+def bootstrap(sha, target_file):
+    if os.environ.get("MOTH_BOOTSTRAP_REPO") is not None:
+        base_url = os.environ.get("MOTH_BOOTSTRAP_REPO")
+        url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
+    else:
+        url = "https://github.com/pesterhazy/moth/releases/download/r" + \
+            get_main_sha() + "/moth_release.zip"
+
+    sys.stderr.write("moth: bootstrapping version " + sha + ":")
+    sys.stderr.flush()
+
+    download(url, sha, target_file)
 
     sys.stderr.write(" done.\n")
 
