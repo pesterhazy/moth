@@ -1,6 +1,7 @@
 import os.path
 import json
 import hashlib
+import sys
 
 
 class UsageException(Exception):
@@ -36,3 +37,8 @@ def pjoin(*args):
 
 def hash_file(fn):
     return hashlib.sha1(file(fn).read()).hexdigest()
+
+
+def croak():
+    print '\xe2\x9b\x94\xef\xb8\x8f'
+    sys.exit(1)

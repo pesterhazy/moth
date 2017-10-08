@@ -1,4 +1,5 @@
 import util
+import provider
 from util import UsageException
 import requests
 from clint.textui import progress
@@ -17,7 +18,7 @@ def process(f, r, chunk_size):
         f.write(chunk)
 
 
-class HTTPProvider:
+class HTTPProvider(provider.Provider):
     def __init__(self, url):
         self.url = url
 
