@@ -9,4 +9,4 @@ mkdir -p target
 
 target=$(abspath target/bar.zip)
 
-script/zipdir "$target" example/bar
+bin/zipdir "$target" example/bar
