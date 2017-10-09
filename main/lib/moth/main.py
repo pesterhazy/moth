@@ -216,8 +216,9 @@ def action_alias(root_path, options):
     util.write_manifest(manifest, root_path)
 
 
-def action_version():
+def action_version(main_sha):
     print "moth", str(moth.version.MAJOR) + "." + str(moth.version.MINOR)
+    print "main_sha:", main_sha
 
 
 def help_message():
@@ -242,7 +243,7 @@ Retrieving data
 '''[1:-1]
 
 
-def run(base_fn):
+def run(base_fn, main_sha):
     def find_root():
         root_path = util.find_root(base_fn)
         dbg("root_path:", root_path)
@@ -258,32 +259,36 @@ def run(base_fn):
         parser.add_option("--find", dest="find")
         parser.add_option("--workspace", dest="workspace", action="store_true")
         parser.add_option("--cat", dest="cat", action="store_true")
+        parser.add_option("--version", dest="version", action="store_true")
         (options, args) = parser.parse_args()
 
-        if len(args) == 0:
-            action = "default"
-        elif len(args) > 1:
-            fail("Too many positional arguments")
+        if options.version:
+            action_version(main_sha)
         else:
-            action = args[0]
+            if len(args) == 0:
+                action = "default"
+            elif len(args) > 1:
+                fail("Too many positional arguments")
+            else:
+                action = args[0]
 
-        if action == "put":
-            action_put(find_root(), options)
-        elif action == "get":
-            action_get(find_root(), options)
-        elif action == "show":
-            action_show(find_root(), options)
-        elif action == "init":
-            action_init(options)
-        elif action == "alias":
-            action_alias(find_root(), options)
-        elif action == "version":
-            action_version()
-        elif action in ["default", "help"]:
-            help_message()
-        else:
-            fail("Unknown action: " + action)
-            sys.exit(1)
+            if action == "put":
+                action_put(find_root(), options)
+            elif action == "get":
+                action_get(find_root(), options)
+            elif action == "show":
+                action_show(find_root(), options)
+            elif action == "init":
+                action_init(options)
+            elif action == "alias":
+                action_alias(find_root(), options)
+            elif action == "version":
+                action_version(main_sha)
+            elif action in ["default", "help"]:
+                help_message()
+            else:
+                fail("Unknown action: " + action)
+                sys.exit(1)
     except UsageException as e:
         sys.stderr.write("Error: " + e.message + "\n")
         sys.exit(1)

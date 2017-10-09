@@ -3,6 +3,6 @@ set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 set -x
 
-bin/test-literal
+bin/test-readme
 
 bin/doall bin/mock-s3-server -- bash -c 'sleep 1 && bin/faws s3 mb s3://mybucket && bin/test-s3'

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+trap "exit" INT TERM
+trap "kill 0" EXIT
+
+bin/mock-http-server &
+bin/mock-s3-server &
+
+sleep 0.5
+
+bin/test-readme
+bin/test-get
+bin/test-s3

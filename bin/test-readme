@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# start our_temp_dir: v1
+our_temp_dir=$(mktemp -d 2>/dev/null || mktemp -d -t 'our_temp_dir')
+function cleanup_temp_dir() { rm -rf "$our_temp_dir" ; } && trap "cleanup_temp_dir" EXIT
+# end our_temp_dir
+
+set -x
+
+node_modules/.bin/codedown shell < README.md > "$our_temp_dir/transcript"
+cp bin/mothg "$our_temp_dir/moth"
+
+export MOTH_GLOBAL_CACHE="$our_temp_dir/moth-cache"
+export MOTH_BOOTSTRAP_BASE="http://localhost:50002/"
+export PATH="$PWD/bin:$PATH"
+
+cd "$our_temp_dir"
+
+source transcript
+
+./moth version

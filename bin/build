@@ -1,20 +1,38 @@
 #!/usr/bin/env bash
 set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
+abspath() {
+    python -c "import os,sys; print os.path.abspath(sys.argv[1])" "$1"
+}
+
 set -x
 
 rm -rf target
+mkdir -p target
 
-bin/makezip2
-bin/makezip
+target=$(abspath target/moth_release.zip)
 
-set +x
+rm -f "$target"
 
-echo
+pushd main/lib
+zip -q -X -r "$target" --exclude='*.pyc' .
+popd
 
-echo -n "main.zip: "
-bin/moth put --input-file target/moth_release.zip --repository file:$PWD/repo
-echo -n "foo: "
-bin/moth put --input-file example/foo --repository file:$PWD/repo
-echo -n "bar: "
-bin/moth put --input-file target/bar.zip --repository file:$PWD/repo
+pushd third_party
+zip -q -X -r "$target" --exclude='*.pyc' .
+popd
+
+stripzip "$target" > /dev/null
+
+sha=$(perl -MDigest::SHA=sha1_hex -E 'say sha1_hex<>' "$target")
+
+echo "$sha"
+
+echo "$sha" > release.txt
+
+sed "s/SHA_GOES_HERE/$sha/" < bootstrap/bootstrap.py > target/moth
+sed "s/SHA_GOES_HERE/$sha/" < bootstrap/bootstrap.py > bin/mothg
+chmod +x bin/mothg
+
+mkdir "target/$sha"
+ln -sf "$target" "target/$sha"
