@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail && cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
+pipenv --rm
 pipenv install
 v_dir="$(pipenv --venv)"
 sp_dir="$v_dir/lib/python2.7/site-packages"
@@ -14,4 +15,6 @@ rsync -rv \
       --exclude '*.pyc' \
       --exclude '*.so' \
       --exclude '*.dist-info' \
+      --exclude '/wheel' \
+      --exclude '/pip' \
       "$sp_dir/" third_party/
