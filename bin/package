@@ -17,4 +17,9 @@ rsync -rv \
       --exclude '*.dist-info' \
       --exclude '/wheel' \
       --exclude '/pip' \
+      --exclude '/docutils' \
+      --include '/botocore/data/*.json' \
+      --include '/botocore/data/s3' \
+      --include '/botocore/data/s3/**' \
+      --exclude '/botocore/data/*' \
       "$sp_dir/" third_party/
