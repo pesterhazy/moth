@@ -1,4 +1,6 @@
 import os
+import sys
+import stat
 import util
 import string
 import random
@@ -30,9 +32,14 @@ class Provider():
     def verified_get(self, sha, output_file):
         self.get(sha, output_file)
 
-        actual_sha = util.hash_file(output_file)
+        if stat.S_ISREG(os.stat(output_file).st_mode):
+            actual_sha = util.hash_file(output_file)
 
-        if actual_sha != sha:
-            raise Exception("Hash of downloaded file does not match"
-                            + " expected sha: "
-                            + actual_sha + " vs " + sha)
+            if actual_sha != sha:
+                raise Exception("Hash of downloaded file does not match"
+                                + " expected sha: "
+                                + actual_sha + " vs " + sha)
+        else:
+            sys.stderr.write("Skipping verification because output is " +
+                             "not a regular file")
+            sys.stderr.flush()
