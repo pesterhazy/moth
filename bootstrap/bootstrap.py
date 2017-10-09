@@ -10,8 +10,9 @@ MAIN_SHA = "SHA_GOES_HERE"
 
 
 def get_main_sha():
-    if MAIN_SHA == "SHA_GOES_HERE":
-        return os.environ["MOTH_VERSION"]
+    # careful because SHA_GOES_HERE is replaced
+    if MAIN_SHA.startswith("SHA_GOES_"):
+        return os.environ.get("MOTH_VERSION")
     else:
         return MAIN_SHA
 
@@ -27,7 +28,10 @@ def mkdir_p(path):
 
 
 def cache_base_path():
-    return os.path.expanduser("~/.cache/moth")
+    if os.environ.get("MOTH_GLOBAL_CACHE"):
+        return os.environ.get("MOTH_GLOBAL_CACHE")
+    else:
+        return os.path.expanduser("~/.cache/moth")
 
 
 spinner_images = ["[    ]",
@@ -54,7 +58,14 @@ def echo(s):
 
 
 def download(url, sha, target_file):
-    url_file = urllib2.urlopen(url)
+    try:
+        url_file = urllib2.urlopen(url)
+    except urllib2.URLError as e:
+        sys.stderr.write("\n")
+        sys.stderr.write("Could not download: " + str(e) + "\n")
+        sys.stderr.write("Url: " + url + "\n")
+
+        sys.exit(1)
 
     hasher = hashlib.sha1()
 
@@ -87,12 +98,12 @@ def download(url, sha, target_file):
 
 
 def bootstrap(sha, target_file):
-    if os.environ.get("MOTH_BOOTSTRAP_REPO") is not None:
-        base_url = os.environ.get("MOTH_BOOTSTRAP_REPO")
-        url = base_url + "/db/" + sha[0:3] + "/" + sha + "/contents"
+    if os.environ.get("MOTH_BOOTSTRAP_BASE") is not None:
+        base_url = os.environ.get("MOTH_BOOTSTRAP_BASE")
     else:
-        url = "https://github.com/pesterhazy/moth/releases/download/r" + \
-            get_main_sha() + "/moth_release.zip"
+        base_url = "https://github.com/pesterhazy/moth/releases/download/r"
+
+    url = base_url + get_main_sha() + "/moth_release.zip"
 
     sys.stderr.write("moth: bootstrapping version " + sha + ": ")
     sys.stderr.flush()

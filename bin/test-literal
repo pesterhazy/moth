@@ -12,6 +12,8 @@ set -x
 node_modules/.bin/codedown shell < README.md > "$our_temp_dir/transcript"
 cp bin/mothg "$our_temp_dir/moth"
 
+export MOTH_GLOBAL_CACHE="$our_temp_dir/moth-cache"
+export MOTH_BOOTSTRAP_BASE="http://localhost:50002/"
 export PATH="$PWD/bin:$PATH"
 
 cd "$our_temp_dir"

@@ -33,3 +33,6 @@ echo "$sha" > release.txt
 sed "s/SHA_GOES_HERE/$sha/" < bootstrap/bootstrap.py > target/moth
 sed "s/SHA_GOES_HERE/$sha/" < bootstrap/bootstrap.py > bin/mothg
 chmod +x bin/mothg
+
+mkdir "target/$sha"
+ln -sf "$target" "target/$sha"
