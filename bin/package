@@ -22,4 +22,7 @@ rsync -rv \
       --include '/botocore/data/s3' \
       --include '/botocore/data/s3/**' \
       --exclude '/botocore/data/*' \
+      --include '/boto3/data/*.json' \
+      --include '/boto3/data/s3' \
+      --exclude '/boto3/data/*' \
       "$sp_dir/" third_party/
