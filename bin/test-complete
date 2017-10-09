@@ -9,6 +9,6 @@ bin/mock-s3-server &
 
 sleep 0.5
 
-bin/test-literal
-bin/test-all
+bin/test-readme
+bin/test-get
 bin/test-s3
