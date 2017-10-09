@@ -107,7 +107,8 @@ def get_zip_path(sha):
 
 
 def start():
-    ZIP_PATH = get_zip_path(get_main_sha())
+    main_sha = get_main_sha()
+    ZIP_PATH = get_zip_path(main_sha)
 
     if os.path.exists(ZIP_PATH):
         sys.path.insert(0, ZIP_PATH)
@@ -115,14 +116,14 @@ def start():
     try:
         import moth.main
     except ImportError:
-        bootstrap(get_main_sha(), ZIP_PATH)
+        bootstrap(main_sha, ZIP_PATH)
 
         if os.path.exists(ZIP_PATH):
             sys.path.insert(0, ZIP_PATH)
 
         import moth.main
 
-    moth.main.run(os.path.dirname(__file__))
+    moth.main.run(os.path.dirname(__file__), main_sha)
 
 
 start()

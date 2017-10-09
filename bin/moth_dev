@@ -14,4 +14,4 @@ if os.path.exists(THIRD_PARTY_PATH):
 
 import moth.main
 
-moth.main.run(os.path.curdir)
+moth.main.run(os.path.curdir,"NO_SHA")

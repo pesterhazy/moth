@@ -7,14 +7,3 @@ rm -rf target
 
 bin/makezip2
 bin/makezip
-
-set +x
-
-echo
-
-echo -n "main.zip: "
-bin/moth put --input-file target/moth_release.zip --repository file:$PWD/repo
-echo -n "foo: "
-bin/moth put --input-file example/foo --repository file:$PWD/repo
-echo -n "bar: "
-bin/moth put --input-file target/bar.zip --repository file:$PWD/repo
