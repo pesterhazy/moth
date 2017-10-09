@@ -18,6 +18,8 @@ rsync -rv \
       --exclude '/wheel' \
       --exclude '/pip' \
       --exclude '/docutils' \
+      --exclude '/setuptools' \
+      --exclude '/pkg_resources' \
       --include '/botocore/data/*.json' \
       --include '/botocore/data/s3' \
       --include '/botocore/data/s3/**' \
